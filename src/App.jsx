@@ -288,7 +288,7 @@ export default function App() {
         <div style={{flexShrink:0,width:4,background:'#e8e7e4',cursor:'col-resize'}}/>
 
         {/* Right panel — Chat */}
-        <div style={{flexShrink:0,width:420,display:'flex',flexDirection:'column',height:'calc(100vh - 48px)',overflow:'hidden',background:'#fff',borderLeft:'1px solid #e8e7e4'}}>
+        <div style={{flexShrink:0,width:'420px',display:'flex',flexDirection:'column',position:'relative',background:'#fff',borderLeft:'1px solid #e8e7e4'}}>
 
           {/* Label */}
           <div style={{flexShrink:0,fontSize:10,fontWeight:600,color:'#aaa',padding:'10px 14px 6px',letterSpacing:1,textTransform:'uppercase',borderBottom:'1px solid #f0efec'}}>
@@ -296,7 +296,7 @@ export default function App() {
           </div>
 
           {/* Messages — THE scrollable area */}
-          <div ref={chatRef} style={{flex:1,minHeight:0,overflowY:'auto',overflowX:'hidden',padding:12,display:'flex',flexDirection:'column',gap:10}}>
+          <div ref={chatRef} style={{position:'absolute',top:41,bottom:160,left:0,right:0,overflowY:'scroll',padding:12,display:'flex',flexDirection:'column',gap:10}}>
             {messages.length===0 && (
               <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:8,color:'#aaa',fontSize:13,textAlign:'center'}}>
                 <div style={{fontSize:28}}>💬</div>
@@ -330,7 +330,7 @@ export default function App() {
           </div>
 
           {/* Suggestions — collapsible */}
-          <div style={{flexShrink:0,borderTop:'1px solid #f0efec'}}>
+          <div style={{position:'absolute',bottom:56,left:0,right:0,borderTop:'1px solid #f0efec',background:'#fff'}}>
             <div onClick={()=>setShowSugg(s=>!s)} style={{padding:'6px 12px',fontSize:10,color:'#aaa',cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center',userSelect:'none'}}>
               <span>SUGGESTED QUESTIONS</span><span>{showSugg?'▲':'▼'}</span>
             </div>
@@ -342,7 +342,7 @@ export default function App() {
           </div>
 
           {/* Input */}
-          <div style={{flexShrink:0,padding:'8px 12px 12px',borderTop:'1px solid #e8e7e4',display:'flex',gap:8,alignItems:'center',background:'#fff'}}>
+          <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'8px 12px 12px',borderTop:'1px solid #e8e7e4',display:'flex',gap:8,alignItems:'center',background:'#fff'}}>
             <input
               value={input}
               onChange={e=>setInput(e.target.value)}
