@@ -288,7 +288,7 @@ export default function App() {
         <div style={{flexShrink:0,width:4,background:'#e8e7e4',cursor:'col-resize'}}/>
 
         {/* Right panel — Chat */}
-        <div style={{flexShrink:0,width:420,display:'flex',flexDirection:'column',minHeight:0,overflow:'hidden',background:'#fff',borderLeft:'1px solid #e8e7e4'}}>
+        <div style={{flexShrink:0,width:420,display:'flex',flexDirection:'column',height:'100%',minHeight:0,overflow:'hidden',background:'#fff',borderLeft:'1px solid #e8e7e4'}}>
 
           {/* Label */}
           <div style={{flexShrink:0,fontSize:10,fontWeight:600,color:'#aaa',padding:'10px 14px 6px',letterSpacing:1,textTransform:'uppercase',borderBottom:'1px solid #f0efec'}}>
