@@ -114,23 +114,22 @@ function StatCard({ value, label }) {
 function BidTable({ filter }) {
   const items = filter === "All" ? ITEMS : ITEMS.filter(i => i.category === filter);
   return (
-    <div style={{overflowX:"auto"}}>
-      <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:900}}>
-        <thead>
-          <tr style={{background:"var(--surface-2)"}}>
-            <th style={th({minWidth:220,textAlign:"left"})}>Item</th>
-            <th style={th({textAlign:"right",minWidth:60})}>Qty</th>
-            {VENDORS.map(v => (
-              <th key={v.id} style={th({textAlign:"left",minWidth:110})}>
-                <div style={{display:"flex",alignItems:"center",gap:4}}>
-                  <span>{v.name.split(" ")[0]}</span>
-                  {RED_FLAG_VIDS.has(v.id) && <span style={{width:6,height:6,borderRadius:"50%",background:"#e24b4a",display:"inline-block",flexShrink:0}} title="Has risk flags"/>}
-                </div>
-                <div style={{fontSize:10,color:"var(--text-muted)",fontWeight:400,marginTop:1}}>{v.id}</div>
-              </th>
-            ))}
-          </tr>
-        </thead>
+    <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:900}}>
+      <thead>
+        <tr style={{background:"var(--surface-2)"}}>
+          <th style={th({minWidth:220,textAlign:"left"})}>Item</th>
+          <th style={th({textAlign:"right",minWidth:60})}>Qty</th>
+          {VENDORS.map(v => (
+            <th key={v.id} style={th({textAlign:"left",minWidth:110})}>
+              <div style={{display:"flex",alignItems:"center",gap:4}}>
+                <span>{v.name.split(" ")[0]}</span>
+                {RED_FLAG_VIDS.has(v.id) && <span style={{width:6,height:6,borderRadius:"50%",background:"#e24b4a",display:"inline-block",flexShrink:0}} title="Has risk flags"/>}
+              </div>
+              <div style={{fontSize:10,color:"var(--text-muted)",fontWeight:400,marginTop:1}}>{v.id}</div>
+            </th>
+          ))}
+        </tr>
+      </thead>
         <tbody>
           {items.map(item => {
             const prices = VENDORS.map(v => item.bids[v.id]?.unit_price).filter(Boolean);
@@ -159,12 +158,11 @@ function BidTable({ filter }) {
           })}
         </tbody>
       </table>
-    </div>
   );
 }
 
 function th(extra={}) {
-  return {padding:"10px 12px",fontWeight:500,fontSize:12,color:"var(--text-secondary)",borderBottom:"0.5px solid var(--border)",whiteSpace:"nowrap",position:"sticky",top:49,background:"var(--surface-2)",...extra};
+  return {padding:"10px 12px",fontWeight:500,fontSize:12,color:"var(--text-secondary)",borderBottom:"0.5px solid var(--border)",whiteSpace:"nowrap",background:"var(--surface-2)",...extra};
 }
 
 function AITable({ data }) {
@@ -335,8 +333,8 @@ export default function App() {
       </div>
 
       {/* Left — Comparison Table */}
-      <div style={{overflow:"auto",borderRight:"0.5px solid var(--border)",background:"var(--surface-0)",minWidth:0}}>
-        {/* Stats */}
+      <div style={{overflowY:"auto",overflowX:"auto",borderRight:"0.5px solid var(--border)",background:"var(--surface-0)",minWidth:0,minHeight:0}}>
+        {/* Stats — scrolls with content, not sticky */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,padding:"10px 14px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)"}}>
           <StatCard value="5" label="Vendors"/>
           <StatCard value="30" label="Line items"/>
@@ -344,7 +342,7 @@ export default function App() {
           <StatCard value="13" label="Risk flags"/>
         </div>
 
-        {/* Filter tabs */}
+        {/* Filter tabs — sticky at top of left panel */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,padding:"10px 14px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)",position:"sticky",top:0,zIndex:10}}>
           <div style={{fontSize:13,fontWeight:500,color:"var(--text-primary)",whiteSpace:"nowrap"}}>Side-by-side comparison</div>
           <div style={{display:"flex",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}}>
