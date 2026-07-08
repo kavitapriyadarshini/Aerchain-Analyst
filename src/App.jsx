@@ -326,6 +326,73 @@ function ConfidenceDot({ level }) {
   return <span style={{display:"inline-block",width:6,height:6,borderRadius:"50%",background:color,marginRight:5,verticalAlign:"middle"}}/>;
 }
 
+function groupFlags(flags) {
+  const groups = {};
+  flags.forEach(f => {
+    const text = String(f).replace(/^⚠\s*/, "");
+    const match = text.match(/^(V\d[^:)]*[):]\s*)/);
+    const key = match ? match[1].trim().replace(/:$/, "").replace(/\)$/, "") : "General";
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(text.replace(/^V\d[^:)]*[):]\s*/, "").trim());
+  });
+  return groups;
+}
+
+const BOLD_TERMS = [
+  "NOT QUOTED", "not quoted", "incomplete", "no ISO", "pending renewal",
+  "NDA", "grey market", "unbranded", "counterfeit", "undisclosed",
+  "implausible", "STRONGLY RECOMMEND EXCLUSION", "red flag",
+  "no client references", "not confirmed", "high risk", "FIDO2",
+];
+
+function highlightTerms(text) {
+  const pattern = new RegExp(`(${BOLD_TERMS.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "gi");
+  const parts = String(text).split(pattern);
+  return parts.map((part, i) =>
+    BOLD_TERMS.some(t => t.toLowerCase() === part.toLowerCase())
+      ? <strong key={i} style={{fontWeight:600}}>{part}</strong>
+      : part
+  );
+}
+
+function formatFlagGroupLabel(key) {
+  if (key === "General") return "⚠ General";
+  const idMatch = key.match(/^(V\d+)/);
+  if (idMatch) {
+    const vendor = VENDORS.find(v => v.id === idMatch[1]);
+    if (vendor) return `⚠ ${idMatch[1]} — ${vendor.name.split(" ")[0]}`;
+  }
+  return `⚠ ${key}`;
+}
+
+function FlagGroups({ flags }) {
+  const groups = groupFlags(flags);
+  return (
+    <div style={{marginTop:8}}>
+      {Object.entries(groups).map(([key, items]) => (
+        <div
+          key={key}
+          style={{
+            background:"#fffbf0",borderLeft:"3px solid #f59e0b",
+            borderRadius:"0 6px 6px 0",padding:"8px 12px",marginBottom:6,textAlign:"left",
+          }}
+        >
+          <div style={{fontWeight:700,fontSize:11,color:"#78350f",marginBottom:4}}>
+            {formatFlagGroupLabel(key)}
+          </div>
+          <ul style={{margin:0,paddingLeft:12,listStyle:"none"}}>
+            {items.map((item, i) => (
+              <li key={i} style={{fontSize:11,color:"#78350f",lineHeight:1.45,marginBottom:2}}>
+                <span style={{marginRight:6}}>•</span>{highlightTerms(item)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── Main App ────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -579,19 +646,7 @@ export default function App() {
                 }}>{p.summary}</div>
                 {(p.answer_type==="table"||p.answer_type==="mixed") && <AITable data={p.data}/>}
                 {(p.answer_type==="chart"||p.answer_type==="mixed") && <AIChart data={p.data}/>}
-                {p.flags?.length > 0 && (
-                  <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:4}}>
-                    {p.flags.map((f,fi)=>(
-                      <div key={fi} style={{
-                        fontSize:11,color:"#78350f",background:"#fffbf0",
-                        borderLeft:"3px solid #f59e0b",borderRadius:"0 6px 6px 0",
-                        padding:"8px 10px",textAlign:"left",
-                      }}>
-                        ⚠ {String(f).replace(/^⚠\s*/, "")}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {p.flags?.length > 0 && <FlagGroups flags={p.flags} />}
                 <div style={{fontSize:10,color:"#888780",marginTop:8,display:"flex",alignItems:"center",textAlign:"left"}}>
                   <ConfidenceDot level={p.confidence}/>{p.confidence} confidence
                 </div>
