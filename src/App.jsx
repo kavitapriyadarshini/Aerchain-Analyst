@@ -232,8 +232,8 @@ export default function App() {
           <span style={{ fontSize: 10, color: '#888', background: '#1f1f1f', border: '1px solid #2a2a2a', borderRadius: 999, padding: '2px 8px' }}>RFQ-2026-IT-0047</span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={downloadCSV} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#ccc', cursor: 'pointer' }}>↓ Export CSV</button>
-          <button onClick={() => window.print()} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#ccc', cursor: 'pointer' }}>↓ Export PDF</button>
+          <button onClick={downloadCSV} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#888', cursor: 'pointer' }}>↓ Export CSV</button>
+          <button onClick={() => window.print()} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#888', cursor: 'pointer' }}>↓ Export PDF</button>
         </div>
       </div>
 
@@ -266,7 +266,7 @@ export default function App() {
               <thead>
                 <tr style={{ background: '#f5f5f3', position: 'sticky', top: 0, zIndex: 1 }}>
                   <th style={{ padding: '7px 10px', textAlign: 'left', fontWeight: 500, fontSize: 10, color: '#888', borderBottom: '1px solid #e8e7e4', minWidth: 190 }}>
-                    Item <span style={{ fontWeight: 400, color: '#ccc' }}>· Price · Lead · Warranty</span>
+                    Item <span style={{ fontWeight: 400, color: '#aaa' }}>· Price · Lead · Warranty</span>
                   </th>
                   <th style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 500, fontSize: 10, color: '#888', borderBottom: '1px solid #e8e7e4' }}>Qty</th>
                   {V.map(v => (
@@ -287,7 +287,7 @@ export default function App() {
                   return (
                     <tr key={item.id} style={{ background: ri % 2 === 0 ? '#fff' : '#fafaf9', borderBottom: '1px solid #f0efec' }}>
                       <td style={{ padding: '6px 10px', verticalAlign: 'top' }}>
-                        <div style={{ fontSize: 9, color: '#ccc', marginBottom: 1 }}>{item.id}</div>
+                        <div style={{ fontSize: 9, color: '#999', marginBottom: 1 }}>{item.id}</div>
                         <div style={{ fontSize: 11, fontWeight: 500, color: '#111', lineHeight: 1.4 }}>{item.description}</div>
                       </td>
                       <td style={{ padding: '6px 10px', textAlign: 'right', color: '#999', verticalAlign: 'top', fontSize: 11 }}>{item.quantity} {item.unit}</td>
@@ -298,7 +298,7 @@ export default function App() {
                         return (
                           <td key={v.id} style={{ padding: '6px 10px', textAlign: 'right', verticalAlign: 'top' }}>
                             <div style={{ fontSize: 12, fontWeight: isLow ? 600 : 400, color: isLow ? '#2d6a1f' : isHigh ? '#991b1b' : '#111', fontVariantNumeric: 'tabular-nums' }}>₹{b.unit_price.toLocaleString('en-IN')}</div>
-                            <div style={{ fontSize: 9, color: '#bbb', marginTop: 1 }}>{b.lead_time_days}d · {b.warranty_years}yr</div>
+                            <div style={{ fontSize: 9, color: '#888', marginTop: 1 }}>{b.lead_time_days}d · {b.warranty_years}yr</div>
                           </td>
                         );
                       })}
