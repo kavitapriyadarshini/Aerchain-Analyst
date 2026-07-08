@@ -105,11 +105,11 @@ function downloadCSV() {
 function StatCell({ value, label, last }) {
   return (
     <div style={{
-      flex:1,minWidth:0,padding:"14px 16px",background:"#fff",
-      borderRight: last ? "none" : "1px solid #e5e5e3",
+      flex:1,minWidth:0,padding:"12px 16px",background:"#fff",
+      borderRight: last ? "none" : "1px solid #e8e7e4",
     }}>
-      <div style={{fontSize:24,fontWeight:600,color:"#111",lineHeight:1.1,fontVariantNumeric:"tabular-nums"}}>{value}</div>
-      <div style={{fontSize:11,color:"#888780",marginTop:4}}>{label}</div>
+      <div style={{fontSize:28,fontWeight:600,color:"#111",lineHeight:1.1,fontVariantNumeric:"tabular-nums"}}>{value}</div>
+      <div style={{fontSize:11,color:"#999",marginTop:2}}>{label}</div>
     </div>
   );
 }
@@ -155,22 +155,21 @@ function BidTable({ filter }) {
           const rowBg = idx % 2 === 0 ? "#fff" : "#fafaf9";
           return (
             <tr key={item.id} style={{background:rowBg,borderBottom:"1px solid #e5e5e3"}}>
-              <td style={{padding:"10px 14px",verticalAlign:"top",minWidth:220,textAlign:"left"}}>
-                <div style={{fontSize:10,color:"#888780",marginBottom:2}}>{item.id}</div>
-                <div style={{fontSize:12,lineHeight:1.45,color:"#111"}}>{item.description}</div>
-                <span style={{
-                  display:"inline-block",fontSize:9,padding:"1px 6px",borderRadius:10,
-                  background:"#f0efec",color:"#5f5e5a",marginTop:5,
-                }}>{item.category}</span>
+              <td style={{padding:"5px 10px",verticalAlign:"top",minWidth:220,textAlign:"left"}}>
+                <div style={{fontSize:9,color:"#aaa",fontWeight:400,marginBottom:2}}>{item.id}</div>
+                <div style={{
+                  fontSize:12,fontWeight:500,lineHeight:1.4,color:"#111",
+                  overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",
+                }}>{item.description}</div>
               </td>
-              <td style={{padding:"10px 12px",textAlign:"right",color:"#888780",verticalAlign:"top",whiteSpace:"nowrap",fontSize:12}}>
+              <td style={{padding:"5px 10px",textAlign:"right",color:"#888780",verticalAlign:"top",whiteSpace:"nowrap",fontSize:12}}>
                 {item.quantity} {item.unit}
               </td>
               {VENDORS.map(v => {
                 const b = item.bids[v.id];
                 if (!b) {
                   return (
-                    <td key={v.id} style={{padding:"10px 14px",textAlign:"center",color:"#888780",verticalAlign:"top",minWidth:110}}>
+                    <td key={v.id} style={{padding:"5px 10px",textAlign:"center",color:"#888780",verticalAlign:"top",minWidth:110}}>
                       —
                     </td>
                   );
@@ -180,13 +179,13 @@ function BidTable({ filter }) {
                 const color = isLow ? "#2d6a1f" : isHigh ? "#991b1b" : "#111";
                 return (
                   <td key={v.id} style={{
-                    padding:"10px 14px",textAlign:"right",verticalAlign:"top",
+                    padding:"5px 10px",textAlign:"right",verticalAlign:"top",
                     fontVariantNumeric:"tabular-nums",color,minWidth:110,
                   }}>
-                    <div style={{fontSize:12,fontWeight:isLow ? 700 : 400,whiteSpace:"nowrap"}}>
+                    <div style={{fontSize:12,fontWeight:isLow ? 500 : 400,whiteSpace:"nowrap"}}>
                       ₹{b.unit_price.toLocaleString("en-IN")}
                     </div>
-                    <div style={{fontSize:10,color:"#888780",marginTop:2,whiteSpace:"nowrap"}}>
+                    <div style={{fontSize:10,color:"#bbb",marginTop:2,whiteSpace:"nowrap"}}>
                       {b.lead_time_days}d · {b.warranty_years}yr
                     </div>
                   </td>
@@ -202,7 +201,7 @@ function BidTable({ filter }) {
 
 function th(extra={}) {
   return {
-    padding:"10px 14px",fontWeight:500,fontSize:11,color:"#5f5e5a",
+    padding:"5px 10px",fontWeight:500,fontSize:11,color:"#5f5e5a",
     borderBottom:"1px solid #e5e5e3",whiteSpace:"nowrap",
     position:"sticky",top:46,zIndex:5,background:"#f0efec",...extra,
   };
@@ -402,6 +401,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("aerchain_onboarded"));
+  const [showOnboardingDetail, setShowOnboardingDetail] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [chatWidth, setChatWidth] = useState(420);
   const [dragging, setDragging] = useState(false);
   const chatRef = useRef(null);
@@ -417,6 +418,8 @@ export default function App() {
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: #d1d1ce; border-radius: 4px; }
       @keyframes pulse { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
+      .export-btn { transition: background 0.15s, color 0.15s; }
+      .export-btn:hover { background: #1a1a18 !important; color: #fff !important; }
     `;
     if (!document.getElementById("aerchain-theme")) document.head.appendChild(style);
     return () => { document.getElementById("aerchain-theme")?.remove(); };
@@ -444,6 +447,12 @@ export default function App() {
       document.removeEventListener("mouseup", onUp);
     };
   }, [dragging]);
+
+  useEffect(() => {
+    if (!showToast) return;
+    const t = setTimeout(() => setShowToast(false), 3000);
+    return () => clearTimeout(t);
+  }, [showToast]);
 
   const lowestVendor = Object.entries(TOTALS).sort((a,b)=>a[1]-b[1])[0];
 
@@ -492,24 +501,25 @@ export default function App() {
         height:48,padding:"0 16px",margin:0,background:"#0f0f0f",borderRadius:0,flexShrink:0,
       }}>
         <div style={{display:"flex",alignItems:"center",gap:12,minWidth:0}}>
-          <div style={{fontSize:15,fontWeight:500,letterSpacing:-0.2,whiteSpace:"nowrap",color:"#fff"}}>
-            aerchain <span style={{color:"#378add"}}>analyst</span>
+          <div style={{fontSize:16,letterSpacing:-0.2,whiteSpace:"nowrap",color:"#fff"}}>
+            <span style={{fontWeight:300}}>aerchain</span>{" "}
+            <span style={{fontWeight:600,color:"#378add"}}>analyst</span>
           </div>
           <div style={{
-            fontSize:11,color:"#a1a1a1",background:"#1f1f1f",border:"1px solid #2a2a2a",
-            borderRadius:999,padding:"3px 10px",whiteSpace:"nowrap",
+            fontSize:10,color:"#666",background:"#1f1f1f",border:"1px solid #2a2a2a",
+            borderRadius:999,padding:"2px 8px",whiteSpace:"nowrap",
           }}>
             RFQ-2026-IT-0047
           </div>
         </div>
         <div style={{display:"flex",gap:8,flexShrink:0}}>
-          <button onClick={downloadCSV} style={{
+          <button className="export-btn" onClick={downloadCSV} style={{
             fontSize:12,padding:"5px 10px",border:"1px solid #3a3a3a",borderRadius:6,
             background:"transparent",color:"#cfcfcf",cursor:"pointer",
           }}>
             Export CSV
           </button>
-          <button onClick={()=>window.print()} style={{
+          <button className="export-btn" onClick={() => setShowToast(true)} style={{
             fontSize:12,padding:"5px 10px",border:"1px solid #3a3a3a",borderRadius:6,
             background:"transparent",color:"#cfcfcf",cursor:"pointer",
           }}>
@@ -517,6 +527,16 @@ export default function App() {
           </button>
         </div>
       </div>
+
+      {showToast && (
+        <div style={{
+          position:"fixed",bottom:20,right:20,zIndex:9999,
+          background:"#111",color:"#fff",fontSize:12,padding:"10px 16px",borderRadius:8,
+          maxWidth:320,lineHeight:1.5,boxShadow:"0 4px 12px rgba(0,0,0,0.2)",
+        }}>
+          Use browser Print (Cmd+P) and select Save as PDF for best results
+        </div>
+      )}
 
       <div style={{display:"flex",flexDirection:"row",flex:1,minHeight:0,overflow:"hidden"}}>
       {/* Left — Comparison Table */}
@@ -526,36 +546,64 @@ export default function App() {
       }}>
         {showOnboarding && (
           <div style={{
-            position:"relative",background:"#fff",borderLeft:"4px solid #378add",
-            borderBottom:"1px solid #e5e5e3",padding:"12px 16px",fontSize:12,lineHeight:1.6,color:"#111",
+            background:"#fff",borderBottom:"1px solid #f0efec",padding: showOnboardingDetail ? "10px 16px" : "8px 16px",
+            fontSize:12,lineHeight:1.6,color:"#111",
           }}>
-            <button
-              onClick={() => {
-                localStorage.setItem("aerchain_onboarded", "true");
-                setShowOnboarding(false);
-              }}
-              style={{
-                position:"absolute",top:10,right:14,border:"none",background:"transparent",
-                color:"#378add",fontSize:12,cursor:"pointer",padding:0,fontWeight:500,
-              }}
-            >
-              Got it ✓
-            </button>
-            <div style={{fontWeight:600,marginBottom:4,paddingRight:72}}>👋 Welcome to Aerchain Analyst</div>
-            <div style={{color:"#5f5e5a",paddingRight:72}}>
-              Browse the bid comparison table on the left. Filter by category using the tabs above.
-            </div>
-            <ul style={{margin:"8px 0 0",paddingLeft:18,color:"#5f5e5a"}}>
-              <li>Red number badges = risk flags on that vendor (hover to see count)</li>
-              <li>Each price cell shows: Price · Lead time (days) · Warranty (years)</li>
-              <li>Green price = lowest bid for that item · Red price = highest bid</li>
-              <li>Ask the AI analyst anything in the chat on the right →</li>
-            </ul>
+            {!showOnboardingDetail ? (
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+                <button
+                  onClick={() => setShowOnboardingDetail(true)}
+                  style={{
+                    border:"none",background:"transparent",color:"#378add",fontSize:12,
+                    cursor:"pointer",padding:0,textAlign:"left",fontWeight:500,
+                  }}
+                >
+                  👋 New here? See how to read this table ›
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.setItem("aerchain_onboarded", "true");
+                    setShowOnboarding(false);
+                  }}
+                  style={{
+                    border:"none",background:"transparent",color:"#999",fontSize:11,
+                    cursor:"pointer",padding:0,flexShrink:0,
+                  }}
+                >
+                  Dismiss
+                </button>
+              </div>
+            ) : (
+              <div style={{position:"relative"}}>
+                <button
+                  onClick={() => {
+                    localStorage.setItem("aerchain_onboarded", "true");
+                    setShowOnboarding(false);
+                  }}
+                  style={{
+                    position:"absolute",top:0,right:0,border:"none",background:"transparent",
+                    color:"#378add",fontSize:12,cursor:"pointer",padding:0,fontWeight:500,
+                  }}
+                >
+                  Got it ✓
+                </button>
+                <div style={{fontWeight:600,marginBottom:4,paddingRight:72}}>👋 Welcome to Aerchain Analyst</div>
+                <div style={{color:"#5f5e5a",paddingRight:72}}>
+                  Browse the bid comparison table on the left. Filter by category using the tabs above.
+                </div>
+                <ul style={{margin:"8px 0 0",paddingLeft:18,color:"#5f5e5a"}}>
+                  <li>Red number badges = risk flags on that vendor (hover to see count)</li>
+                  <li>Each price cell shows: Price · Lead time (days) · Warranty (years)</li>
+                  <li>Green price = lowest bid for that item · Red price = highest bid</li>
+                  <li>Ask the AI analyst anything in the chat on the right →</li>
+                </ul>
+              </div>
+            )}
           </div>
         )}
 
         {/* Stats */}
-        <div style={{display:"flex",width:"100%",borderBottom:"1px solid #e5e5e3",background:"#fff"}}>
+        <div style={{display:"flex",width:"100%",borderBottom:"1px solid #f0efec",background:"#fff"}}>
           <StatCell value="5" label="Vendors"/>
           <StatCell value="30" label="Line items"/>
           <StatCell value={`₹${(TOTALS[lowestVendor[0]]/100000).toFixed(0)}L`} label="Lowest total bid"/>
@@ -637,18 +685,21 @@ export default function App() {
             return (
               <div key={i} style={{
                 alignSelf:"flex-start",width:"100%",boxSizing:"border-box",
-                background:"#fff",border:"1px solid #e5e5e3",
-                borderRadius:"2px 12px 12px 12px",padding:"11px 13px",textAlign:"left",
+                background:"#fafaf9",borderRadius:"2px 12px 12px 12px",
+                boxShadow:"0 1px 3px rgba(0,0,0,0.06)",overflow:"hidden",textAlign:"left",
               }}>
-                <div style={{
-                  fontSize:13,lineHeight:1.55,color:"#111",textAlign:"left",
-                  marginBottom:p.data||p.flags?.length?8:0,
-                }}>{p.summary}</div>
-                {(p.answer_type==="table"||p.answer_type==="mixed") && <AITable data={p.data}/>}
-                {(p.answer_type==="chart"||p.answer_type==="mixed") && <AIChart data={p.data}/>}
-                {p.flags?.length > 0 && <FlagGroups flags={p.flags} />}
-                <div style={{fontSize:10,color:"#888780",marginTop:8,display:"flex",alignItems:"center",textAlign:"left"}}>
-                  <ConfidenceDot level={p.confidence}/>{p.confidence} confidence
+                <div style={{height:3,background:"#378add",width:"100%"}} />
+                <div style={{padding:"11px 13px"}}>
+                  <div style={{
+                    fontSize:13,lineHeight:1.6,color:"#1a1a18",textAlign:"left",
+                    marginBottom:p.data||p.flags?.length?8:0,
+                  }}>{p.summary}</div>
+                  {(p.answer_type==="table"||p.answer_type==="mixed") && <AITable data={p.data}/>}
+                  {(p.answer_type==="chart"||p.answer_type==="mixed") && <AIChart data={p.data}/>}
+                  {p.flags?.length > 0 && <FlagGroups flags={p.flags} />}
+                  <div style={{fontSize:10,color:"#888780",marginTop:8,display:"flex",alignItems:"center",textAlign:"left"}}>
+                    <ConfidenceDot level={p.confidence}/>{p.confidence} confidence
+                  </div>
                 </div>
               </div>
             );
