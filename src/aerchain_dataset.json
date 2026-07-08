@@ -1,0 +1,473 @@
+{
+  "scenario": {
+    "company": "Nexova Technologies",
+    "category": "IT Hardware — Laptops, Monitors & Peripherals",
+    "rfx_id": "RFQ-2025-IT-0047",
+    "issued_date": "2026-06-01",
+    "submission_deadline": "2026-06-15",
+    "total_quantity_context": "Annual procurement for 3 regional offices (Bengaluru, Mumbai, Delhi)",
+    "budget_ceiling": 4200000
+  },
+  "vendors": [
+    {
+      "id": "V1",
+      "name": "Crestline Systems Pvt. Ltd.",
+      "hq": "Bengaluru, India",
+      "years_in_business": 14,
+      "profile": "Mid-size IT hardware distributor, strong in South India, ISO 9001 certified. Known for reliable delivery but not the cheapest."
+    },
+    {
+      "id": "V2",
+      "name": "Orbitex Technologies Ltd.",
+      "hq": "Mumbai, India",
+      "years_in_business": 9,
+      "profile": "Aggressive pricing, pan-India reach. Has had delivery delays in past quarters. Missing several compliance certifications."
+    },
+    {
+      "id": "V3",
+      "name": "Pinnacle InfoSolutions",
+      "hq": "Delhi, India",
+      "years_in_business": 21,
+      "profile": "Oldest vendor in the mix. Premium pricing, excellent certifications, slow but dependable. Strong after-sales."
+    },
+    {
+      "id": "V4",
+      "name": "SwiftEdge Procurement Co.",
+      "hq": "Pune, India",
+      "years_in_business": 5,
+      "profile": "Newest entrant. Suspiciously low prices across the board, claims fast delivery, ticks every certification box — but thin track record. Red flag vendor."
+    },
+    {
+      "id": "V5",
+      "name": "Meridian Tech Supplies",
+      "hq": "Hyderabad, India",
+      "years_in_business": 11,
+      "profile": "Solid mid-market option. Good certifications, average pricing, some line items not quoted (MFR unavailability cited)."
+    }
+  ],
+  "line_items": [
+    {
+      "id": "LI-01", "category": "Laptop", "description": "Business Laptop 14\" — Core i5, 16GB RAM, 512GB SSD, Windows 11 Pro", "quantity": 120, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 68500, "lead_time_days": 18, "warranty_years": 3, "notes": "Includes onsite support Year 1"},
+        "V2": {"unit_price": 61200, "lead_time_days": 35, "warranty_years": 2, "notes": null},
+        "V3": {"unit_price": 72000, "lead_time_days": 21, "warranty_years": 3, "notes": "Premium brand, extended warranty available"},
+        "V4": {"unit_price": 55000, "lead_time_days": 10, "warranty_years": 3, "notes": "Best price guaranteed"},
+        "V5": {"unit_price": 67000, "lead_time_days": 22, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-02", "category": "Laptop", "description": "Performance Laptop 15\" — Core i7, 32GB RAM, 1TB SSD, Windows 11 Pro", "quantity": 45, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 112000, "lead_time_days": 21, "warranty_years": 3, "notes": null},
+        "V2": {"unit_price": 99500, "lead_time_days": 40, "warranty_years": 2, "notes": "Import subject to port delays"},
+        "V3": {"unit_price": 118000, "lead_time_days": 25, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 88000, "lead_time_days": 12, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 108000, "lead_time_days": 24, "warranty_years": 3, "notes": null}
+      }
+    },
+    {
+      "id": "LI-03", "category": "Laptop", "description": "Ultrabook 13\" — Core i5, 16GB RAM, 256GB SSD, Windows 11 Home", "quantity": 60, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 78000, "lead_time_days": 18, "warranty_years": 2, "notes": null},
+        "V2": {"unit_price": 69000, "lead_time_days": 38, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 82000, "lead_time_days": 20, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 61000, "lead_time_days": 10, "warranty_years": 3, "notes": null},
+        "V5": null
+      }
+    },
+    {
+      "id": "LI-04", "category": "Laptop", "description": "Developer Workstation Laptop 16\" — Core i9, 64GB RAM, 2TB SSD, Linux", "quantity": 20, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 195000, "lead_time_days": 30, "warranty_years": 3, "notes": "Made-to-order"},
+        "V2": null,
+        "V3": {"unit_price": 210000, "lead_time_days": 35, "warranty_years": 3, "notes": "Certified for Linux, tested"},
+        "V4": {"unit_price": 162000, "lead_time_days": 14, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 188000, "lead_time_days": 32, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-05", "category": "Monitor", "description": "24\" FHD Monitor — IPS Panel, 75Hz, HDMI+DP", "quantity": 200, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 14500, "lead_time_days": 14, "warranty_years": 3, "notes": null},
+        "V2": {"unit_price": 12800, "lead_time_days": 28, "warranty_years": 2, "notes": null},
+        "V3": {"unit_price": 15200, "lead_time_days": 18, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 11200, "lead_time_days": 8, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 13900, "lead_time_days": 16, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-06", "category": "Monitor", "description": "27\" QHD Monitor — IPS, 144Hz, USB-C 65W charging, HDR400", "quantity": 80, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 28500, "lead_time_days": 18, "warranty_years": 3, "notes": null},
+        "V2": {"unit_price": 25200, "lead_time_days": 35, "warranty_years": 2, "notes": null},
+        "V3": {"unit_price": 31000, "lead_time_days": 22, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 21500, "lead_time_days": 10, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 27000, "lead_time_days": 20, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-07", "category": "Monitor", "description": "32\" 4K Monitor — VA Panel, 60Hz, HDMI 2.1, for design/creative use", "quantity": 25, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 42000, "lead_time_days": 22, "warranty_years": 3, "notes": null},
+        "V2": null,
+        "V3": {"unit_price": 46500, "lead_time_days": 28, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 34000, "lead_time_days": 12, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 40500, "lead_time_days": 25, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-08", "category": "Monitor", "description": "Dual Monitor Stand — Adjustable, fits 17\"–32\", steel base", "quantity": 100, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 3800, "lead_time_days": 10, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 3100, "lead_time_days": 20, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 4200, "lead_time_days": 12, "warranty_years": 2, "notes": null},
+        "V4": {"unit_price": 2600, "lead_time_days": 7, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 3600, "lead_time_days": 14, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-09", "category": "Peripheral", "description": "Wireless Keyboard + Mouse Combo — Business grade, 2.4GHz", "quantity": 250, "unit": "sets",
+      "bids": {
+        "V1": {"unit_price": 2200, "lead_time_days": 10, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 1800, "lead_time_days": 18, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 2500, "lead_time_days": 12, "warranty_years": 2, "notes": null},
+        "V4": {"unit_price": 1500, "lead_time_days": 7, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 2100, "lead_time_days": 11, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-10", "category": "Peripheral", "description": "USB-C Docking Station — 12-in-1, 4K HDMI, 100W PD, Ethernet", "quantity": 150, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 8500, "lead_time_days": 15, "warranty_years": 2, "notes": null},
+        "V2": {"unit_price": 7200, "lead_time_days": 30, "warranty_years": 1, "notes": "Grey market stock risk noted internally"},
+        "V3": {"unit_price": 9200, "lead_time_days": 18, "warranty_years": 2, "notes": null},
+        "V4": {"unit_price": 6000, "lead_time_days": 9, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 8000, "lead_time_days": 17, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-11", "category": "Peripheral", "description": "Noise-Cancelling Headset — USB + 3.5mm, for video calls", "quantity": 180, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 4500, "lead_time_days": 12, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 3800, "lead_time_days": 22, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 5100, "lead_time_days": 15, "warranty_years": 2, "notes": null},
+        "V4": {"unit_price": 3000, "lead_time_days": 8, "warranty_years": 2, "notes": null},
+        "V5": null
+      }
+    },
+    {
+      "id": "LI-12", "category": "Peripheral", "description": "Webcam — 1080p, autofocus, built-in mic, plug-and-play", "quantity": 150, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 3200, "lead_time_days": 10, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 2700, "lead_time_days": 20, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 3500, "lead_time_days": 14, "warranty_years": 1, "notes": null},
+        "V4": {"unit_price": 2100, "lead_time_days": 7, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 3000, "lead_time_days": 12, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-13", "category": "Peripheral", "description": "Laptop Bag — 15.6\", water-resistant, business style", "quantity": 200, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 1800, "lead_time_days": 7, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 1400, "lead_time_days": 15, "warranty_years": 1, "notes": null},
+        "V3": null,
+        "V4": {"unit_price": 1100, "lead_time_days": 5, "warranty_years": 1, "notes": null},
+        "V5": {"unit_price": 1700, "lead_time_days": 9, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-14", "category": "Peripheral", "description": "USB-A Hub — 7-port, USB 3.0, powered", "quantity": 100, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 1500, "lead_time_days": 8, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 1200, "lead_time_days": 18, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 1700, "lead_time_days": 10, "warranty_years": 2, "notes": null},
+        "V4": {"unit_price": 950, "lead_time_days": 6, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 1400, "lead_time_days": 10, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-15", "category": "Peripheral", "description": "Portable SSD — 1TB, USB 3.2 Gen2, rugged", "quantity": 60, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 7800, "lead_time_days": 12, "warranty_years": 3, "notes": null},
+        "V2": {"unit_price": 6500, "lead_time_days": 25, "warranty_years": 2, "notes": null},
+        "V3": {"unit_price": 8200, "lead_time_days": 16, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 5200, "lead_time_days": 9, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 7500, "lead_time_days": 14, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-16", "category": "Networking", "description": "Business WiFi Router — WiFi 6, dual band, for office use", "quantity": 30, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 12000, "lead_time_days": 14, "warranty_years": 3, "notes": null},
+        "V2": {"unit_price": 10200, "lead_time_days": 30, "warranty_years": 2, "notes": null},
+        "V3": {"unit_price": 13500, "lead_time_days": 18, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 8500, "lead_time_days": 10, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 11500, "lead_time_days": 16, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-17", "category": "Networking", "description": "Network Switch — 24-port, Gigabit managed", "quantity": 15, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 18500, "lead_time_days": 18, "warranty_years": 3, "notes": null},
+        "V2": null,
+        "V3": {"unit_price": 21000, "lead_time_days": 22, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 14500, "lead_time_days": 11, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 17800, "lead_time_days": 20, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-18", "category": "Networking", "description": "Cat6 Ethernet Cable — 305m box, plenum rated", "quantity": 20, "unit": "boxes",
+      "bids": {
+        "V1": {"unit_price": 4200, "lead_time_days": 8, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 3500, "lead_time_days": 15, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 4800, "lead_time_days": 10, "warranty_years": 1, "notes": null},
+        "V4": {"unit_price": 2900, "lead_time_days": 6, "warranty_years": 1, "notes": null},
+        "V5": {"unit_price": 4000, "lead_time_days": 9, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-19", "category": "Power", "description": "UPS — 1KVA, online double conversion, for workstations", "quantity": 40, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 15500, "lead_time_days": 20, "warranty_years": 2, "notes": null},
+        "V2": {"unit_price": 13000, "lead_time_days": 38, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 17000, "lead_time_days": 25, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 10500, "lead_time_days": 12, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 14500, "lead_time_days": 22, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-20", "category": "Power", "description": "Surge Protector Strip — 6-outlet, 2m cable, with USB ports", "quantity": 200, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 850, "lead_time_days": 7, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 680, "lead_time_days": 14, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 950, "lead_time_days": 8, "warranty_years": 2, "notes": null},
+        "V4": {"unit_price": 520, "lead_time_days": 5, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 800, "lead_time_days": 8, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-21", "category": "Printing", "description": "Laser Printer — B&W, A4, duplex, network", "quantity": 20, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 22000, "lead_time_days": 15, "warranty_years": 2, "notes": null},
+        "V2": {"unit_price": 19000, "lead_time_days": 30, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 24500, "lead_time_days": 18, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 15500, "lead_time_days": 9, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 21000, "lead_time_days": 16, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-22", "category": "Printing", "description": "Color Multifunction Printer — A4, scan/copy/fax, network", "quantity": 10, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 38000, "lead_time_days": 18, "warranty_years": 2, "notes": null},
+        "V2": {"unit_price": 32000, "lead_time_days": 35, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 42000, "lead_time_days": 22, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 26000, "lead_time_days": 11, "warranty_years": 2, "notes": null},
+        "V5": null
+      }
+    },
+    {
+      "id": "LI-23", "category": "Printing", "description": "Printer Toner Cartridge — Compatible, high yield, black (pack of 10)", "quantity": 50, "unit": "packs",
+      "bids": {
+        "V1": {"unit_price": 5500, "lead_time_days": 8, "warranty_years": 1, "notes": "OEM brand"},
+        "V2": {"unit_price": 4200, "lead_time_days": 15, "warranty_years": 1, "notes": "Third-party compatible"},
+        "V3": {"unit_price": 6000, "lead_time_days": 10, "warranty_years": 1, "notes": "OEM brand"},
+        "V4": {"unit_price": 3200, "lead_time_days": 6, "warranty_years": 1, "notes": "Unbranded — origin not disclosed"},
+        "V5": {"unit_price": 5000, "lead_time_days": 9, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-24", "category": "Storage & Compute", "description": "NAS Device — 4-bay, diskless, for office file server", "quantity": 8, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 45000, "lead_time_days": 25, "warranty_years": 3, "notes": null},
+        "V2": null,
+        "V3": {"unit_price": 52000, "lead_time_days": 30, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 36000, "lead_time_days": 14, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 43000, "lead_time_days": 28, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-25", "category": "Storage & Compute", "description": "HDD — 4TB, 3.5\", 7200 RPM, for NAS", "quantity": 32, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 8500, "lead_time_days": 14, "warranty_years": 3, "notes": null},
+        "V2": {"unit_price": 7200, "lead_time_days": 28, "warranty_years": 2, "notes": null},
+        "V3": {"unit_price": 9200, "lead_time_days": 18, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 5800, "lead_time_days": 10, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 8000, "lead_time_days": 15, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-26", "category": "Collaboration", "description": "Video Conferencing Bar — 4K camera + speaker, USB, for meeting rooms", "quantity": 12, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 52000, "lead_time_days": 22, "warranty_years": 2, "notes": null},
+        "V2": {"unit_price": 45000, "lead_time_days": 40, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 58000, "lead_time_days": 28, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 38000, "lead_time_days": 12, "warranty_years": 2, "notes": null},
+        "V5": {"unit_price": 50000, "lead_time_days": 25, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-27", "category": "Collaboration", "description": "Interactive Display — 75\", 4K, touch, Android + HDMI in", "quantity": 6, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 185000, "lead_time_days": 30, "warranty_years": 3, "notes": null},
+        "V2": null,
+        "V3": {"unit_price": 210000, "lead_time_days": 35, "warranty_years": 3, "notes": null},
+        "V4": {"unit_price": 148000, "lead_time_days": 15, "warranty_years": 3, "notes": null},
+        "V5": {"unit_price": 175000, "lead_time_days": 32, "warranty_years": 2, "notes": null}
+      }
+    },
+    {
+      "id": "LI-28", "category": "Security", "description": "Hardware Security Key — FIDO2/U2F, USB-A + NFC", "quantity": 300, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 3500, "lead_time_days": 12, "warranty_years": 2, "notes": null},
+        "V2": {"unit_price": 2900, "lead_time_days": 22, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 4000, "lead_time_days": 15, "warranty_years": 2, "notes": null},
+        "V4": {"unit_price": 2200, "lead_time_days": 8, "warranty_years": 2, "notes": "Brand not disclosed"},
+        "V5": {"unit_price": 3300, "lead_time_days": 13, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-29", "category": "Security", "description": "Laptop Lock — Kensington-compatible, combination", "quantity": 200, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 800, "lead_time_days": 7, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 650, "lead_time_days": 14, "warranty_years": 1, "notes": null},
+        "V3": {"unit_price": 900, "lead_time_days": 9, "warranty_years": 1, "notes": null},
+        "V4": {"unit_price": 480, "lead_time_days": 5, "warranty_years": 1, "notes": null},
+        "V5": {"unit_price": 750, "lead_time_days": 8, "warranty_years": 1, "notes": null}
+      }
+    },
+    {
+      "id": "LI-30", "category": "Accessories", "description": "Laptop Cooling Pad — 15.6\" compatible, dual fan, USB powered", "quantity": 80, "unit": "nos",
+      "bids": {
+        "V1": {"unit_price": 1200, "lead_time_days": 8, "warranty_years": 1, "notes": null},
+        "V2": {"unit_price": 950, "lead_time_days": 16, "warranty_years": 1, "notes": null},
+        "V3": null,
+        "V4": {"unit_price": 720, "lead_time_days": 6, "warranty_years": 1, "notes": null},
+        "V5": {"unit_price": 1100, "lead_time_days": 9, "warranty_years": 1, "notes": null}
+      }
+    }
+  ],
+  "questionnaire": {
+    "questions": [
+      {"id": "Q1", "text": "What are your payment terms?"},
+      {"id": "Q2", "text": "Do you offer volume discounts? If yes, at what thresholds?"},
+      {"id": "Q3", "text": "What is your return/replacement policy for DOA (Dead on Arrival) items?"},
+      {"id": "Q4", "text": "Are you an authorized reseller for the brands you are quoting?"},
+      {"id": "Q5", "text": "What certifications does your organization hold? (ISO, MSME, etc.)"},
+      {"id": "Q6", "text": "Describe your after-sales support model — escalation path, SLA."},
+      {"id": "Q7", "text": "Have you supplied to companies of similar size (500+ employees) in the last 2 years? Provide references."},
+      {"id": "Q8", "text": "What is your policy on customs/import delays for international shipments?"},
+      {"id": "Q9", "text": "Do you have pan-India delivery capability?"},
+      {"id": "Q10", "text": "What is your financial stability indicator? (Turnover, credit rating, or banker reference)"}
+    ],
+    "responses": {
+      "V1": {
+        "Q1": "Net 45 days from invoice date. Early payment discount of 1.5% for payment within 10 days.",
+        "Q2": "Yes — 3% discount on orders above ₹25L, 5% above ₹50L, negotiable above ₹1Cr.",
+        "Q3": "DOA replacements within 72 hours. Customer ships back, we courier replacement same day of receipt. No questions asked up to 30 days.",
+        "Q4": "Yes. We are authorized resellers for all brands quoted. Authorization letters available on request.",
+        "Q5": "ISO 9001:2015 certified. MSME registered. GeM portal registered vendor.",
+        "Q6": "Dedicated account manager. L1 support via email/phone within 4 business hours. L2 (on-site) within 48 hours. SLA breach triggers penalty clause.",
+        "Q7": "Yes — references: Infosys BPO (2025), Wipro Facilities (2024), Mphasis (2025). Contacts available.",
+        "Q8": "We maintain a local buffer stock of all quoted items. Import delays do not affect delivery commitments.",
+        "Q9": "Yes. Delivery to all 28 states and 8 UTs via 3PL partners. Insurance included.",
+        "Q10": "Annual turnover ₹42 Cr (FY2024). CRISIL rated BBB+. Banker reference from HDFC Bank available."
+      },
+      "V2": {
+        "Q1": "Net 30 days. No early payment discount.",
+        "Q2": "Discount structure not formalized. Can negotiate case by case.",
+        "Q3": "DOA replacement within 7 working days. Customer responsible for return shipping.",
+        "Q4": "Authorized for most brands. Some items sourced through distributors — authorization may vary.",
+        "Q5": "No ISO certification currently. GST registered. Working towards ISO 9001.",
+        "Q6": "Support via email. Response within 24-48 hours. No formal SLA document available.",
+        "Q7": "Have supplied to mid-size companies. References not available for sharing at this stage.",
+        "Q8": "Import delays are passed on to customer with advance notice. No buffer stock maintained.",
+        "Q9": "Pan-India delivery available for most cities. Tier-2/3 cities may incur additional freight charges.",
+        "Q10": "Turnover approximately ₹18 Cr. No formal credit rating. Bank statements available on request."
+      },
+      "V3": {
+        "Q1": "Net 60 days from invoice. LC acceptable for large orders above ₹1Cr.",
+        "Q2": "Volume discounts of 2% above ₹30L, 4% above ₹75L. Structured annually.",
+        "Q3": "DOA replacement within 48 hours. Dedicated logistics partner handles reverse pickup at our cost.",
+        "Q4": "Yes, authorized reseller for all 14 brands in our portfolio. Gold partner status with 3 OEMs.",
+        "Q5": "ISO 9001:2015, ISO 14001:2015 (Environmental), SA8000 (Social Accountability). NSIC registered.",
+        "Q6": "Named account manager + backup. 2-hour response SLA. On-site within 24 hours in metro cities. Monthly review calls.",
+        "Q7": "References: Tata Consultancy Services (2025), Larsen &amp; Toubro (2024), HDFC Life Insurance (2025). All verifiable.",
+        "Q8": "We maintain 90-day rolling buffer stock for all A-category items. Customers are insulated from import disruptions.",
+        "Q9": "Yes. Own logistics in 6 metro cities. 3PL for rest of India. All deliveries fully insured.",
+        "Q10": "Annual turnover ₹95 Cr (FY2024). ICRA rated A-. Stable outlook confirmed by independent auditor."
+      },
+      "V4": {
+        "Q1": "Net 15 days preferred. Flexible for large accounts.",
+        "Q2": "Flat 7% discount on all orders above ₹10L. No threshold structure beyond that.",
+        "Q3": "DOA replacement within 24 hours, anywhere in India. No paperwork required.",
+        "Q4": "We source from multiple channels to ensure best pricing. Authorization documentation available for select brands.",
+        "Q5": "ISO 9001:2015 (certification pending renewal), MSME, Startup India registered.",
+        "Q6": "WhatsApp and email support. 1-hour first response. On-site within 12 hours pan-India.",
+        "Q7": "We have served 50+ enterprise clients. Reference list available after NDA signing.",
+        "Q8": "We guarantee delivery timelines regardless of import status. Internal buffer handles all disruptions.",
+        "Q9": "Yes, pan-India delivery within quoted lead times.",
+        "Q10": "Turnover ₹8 Cr (FY2024, first full year). High-growth trajectory. No formal credit rating yet."
+      },
+      "V5": {
+        "Q1": "Net 45 days. 2% early payment discount if paid within 15 days.",
+        "Q2": "3% discount above ₹20L, 4.5% above ₹40L.",
+        "Q3": "DOA replacement within 5 working days. Reverse pickup arranged by us.",
+        "Q4": "Authorized reseller for primary brands quoted. Two items sourced from sub-distributors.",
+        "Q5": "ISO 9001:2015 certified. GeM vendor. MSME registered.",
+        "Q6": "Dedicated account manager. Email/phone support with 8-hour SLA. On-site support in Hyderabad and Bengaluru same day, other cities within 72 hours.",
+        "Q7": "References: Cognizant (2024), Minda Industries (2025). Will share contacts upon request.",
+        "Q8": "Partial buffer stock. Items with high import dependency may see 5–7 day variance.",
+        "Q9": "Yes, pan-India. Surcharge applicable for Tier-3 cities and North-East.",
+        "Q10": "Annual turnover ₹31 Cr (FY2024). No formal rating. Audited financials available."
+      }
+    }
+  },
+  "attached_documents": [
+    {
+      "vendor_id": "V1",
+      "doc_type": "ISO Certificate",
+      "summary": "ISO 9001:2015 certificate issued by Bureau Veritas. Valid until March 2028. Scope covers procurement, warehousing, and distribution of IT hardware."
+    },
+    {
+      "vendor_id": "V1",
+      "doc_type": "Client Reference Letter",
+      "summary": "Reference letter from Infosys BPO dated Jan 2026. Confirms on-time delivery of 850 laptops and 400 peripherals. Rated 'Excellent' on quality and responsiveness."
+    },
+    {
+      "vendor_id": "V3",
+      "doc_type": "ISO Certificate",
+      "summary": "ISO 9001:2015 and ISO 14001:2015 dual certificate issued by DNV. Valid until August 2028."
+    },
+    {
+      "vendor_id": "V3",
+      "doc_type": "OEM Authorization Letter",
+      "summary": "Gold Partner authorization from a leading PC OEM, valid FY2026-27. Authorizes sale and support of full product line in India."
+    },
+    {
+      "vendor_id": "V4",
+      "doc_type": "Company Registration",
+      "summary": "Startup India DPIIT certificate and MCA incorporation documents. Company incorporated April 2020. Paid-up capital ₹50L."
+    },
+    {
+      "vendor_id": "V5",
+      "doc_type": "ISO Certificate",
+      "summary": "ISO 9001:2015 certificate issued by TUV SUD. Valid until November 2026. Renewal in progress per vendor communication."
+    }
+  ],
+  "red_flags": [
+    {"vendor_id": "V4", "flag": "Pricing 18–25% below market across all categories — economically implausible for a 5-year-old company with ₹8Cr turnover"},
+    {"vendor_id": "V4", "flag": "ISO 9001 certificate listed as 'pending renewal' — not confirmed active"},
+    {"vendor_id": "V4", "flag": "References available only after NDA — non-standard and evasive for a vendor procurement process"},
+    {"vendor_id": "V4", "flag": "Authorization documents 'available for select brands' — not confirmed authorized reseller"},
+    {"vendor_id": "V4", "flag": "Toner cartridges listed as 'unbranded, origin not disclosed' — risk of counterfeit"},
+    {"vendor_id": "V4", "flag": "Hardware security key brand not disclosed — critical for a FIDO2 security device"},
+    {"vendor_id": "V2", "flag": "7 line items not quoted (LI-03 no warranty, LI-04 not quoted, LI-07 not quoted, LI-17 not quoted, LI-24 not quoted, LI-27 not quoted) — incomplete bid"},
+    {"vendor_id": "V2", "flag": "No ISO certification — only vendor without any quality certification"},
+    {"vendor_id": "V2", "flag": "No client references shared — cannot verify enterprise delivery track record"},
+    {"vendor_id": "V2", "flag": "USB-C Docking Station (LI-10) noted internally as 'grey market stock risk'"},
+    {"vendor_id": "V3", "flag": "Net 60 day payment terms are longest in the pool — cash flow impact on buyer"},
+    {"vendor_id": "V5", "flag": "ISO certificate expiring November 2026 — within this contract period"},
+    {"vendor_id": "V5", "flag": "4 line items not quoted (LI-03, LI-11, LI-22, LI-30)"}
+  ]
+}
