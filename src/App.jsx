@@ -288,7 +288,7 @@ export default function App() {
         <div style={{flexShrink:0,width:4,background:'#e8e7e4',cursor:'col-resize'}}/>
 
         {/* Right panel — Chat */}
-        <div style={{flexShrink:0,width:'420px',display:'flex',flexDirection:'column',position:'relative',background:'#fff',borderLeft:'1px solid #e8e7e4'}}>
+        <div style={{flexShrink:0,width:'420px',display:'flex',flexDirection:'column',position:'relative',background:'#fff',height:'calc(100vh - 48px)',borderLeft:'1px solid #e8e7e4'}}>
 
           {/* Label */}
           <div style={{flexShrink:0,fontSize:10,fontWeight:600,color:'#aaa',padding:'10px 14px 6px',letterSpacing:1,textTransform:'uppercase',borderBottom:'1px solid #f0efec'}}>
@@ -296,7 +296,7 @@ export default function App() {
           </div>
 
           {/* Messages — THE scrollable area */}
-          <div ref={chatRef} style={{position:'absolute',top:41,bottom:160,left:0,right:0,overflowY:'scroll',padding:12,display:'flex',flexDirection:'column',gap:10}}>
+          <div ref={chatRef} style={{position:'absolute',top:41,bottom:130,left:0,right:0,overflowY:'scroll',padding:12,display:'flex',flexDirection:'column',gap:10}}>
             {messages.length===0 && (
               <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',gap:8,color:'#aaa',fontSize:13,textAlign:'center'}}>
                 <div style={{fontSize:28}}>💬</div>
