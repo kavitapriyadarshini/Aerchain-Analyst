@@ -554,11 +554,10 @@ export default function App() {
 
       <div style={{
         flex:1,display:"flex",overflow:"hidden",minHeight:0,
-        height:"calc(100vh - 48px)",
       }}>
       {/* Left — Comparison Table */}
       <div style={{
-        flex:1,height:"100%",overflow:"hidden",display:"flex",flexDirection:"column",
+        flex:1,overflow:"hidden",display:"flex",flexDirection:"column",
         minWidth:400,background:"#fafaf9",margin:0,padding:0,
       }}>
         {showOnboarding && (
@@ -663,7 +662,7 @@ export default function App() {
 
       {/* Right — Chat */}
       <div style={{
-        display:"flex",flexDirection:"column",height:"100%",overflow:"hidden",
+        display:"flex",flexDirection:"column",overflow:"hidden",
         background:"#ffffff",width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,
       }}>
         <div style={{
