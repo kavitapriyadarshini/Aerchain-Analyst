@@ -104,9 +104,9 @@ function downloadCSV() {
 
 function StatCard({ value, label }) {
   return (
-    <div style={{background:"var(--surface-1)",borderRadius:"var(--radius)",padding:"10px 12px",border:"0.5px solid var(--border)"}}>
-      <div style={{fontSize:20,fontWeight:500,color:"var(--text-primary)",lineHeight:1}}>{value}</div>
-      <div style={{fontSize:11,color:"var(--text-muted)",marginTop:4}}>{label}</div>
+    <div style={{background:"var(--surface-1)",borderRadius:"var(--radius)",padding:"8px 10px",border:"0.5px solid var(--border)",minWidth:0}}>
+      <div style={{fontSize:18,fontWeight:500,color:"var(--text-primary)",lineHeight:1.15,whiteSpace:"nowrap"}}>{value}</div>
+      <div style={{fontSize:10,color:"var(--text-muted)",marginTop:3,lineHeight:1.2}}>{label}</div>
     </div>
   );
 }
@@ -115,18 +115,18 @@ function BidTable({ filter }) {
   const items = filter === "All" ? ITEMS : ITEMS.filter(i => i.category === filter);
   return (
     <div style={{overflowX:"auto"}}>
-      <table style={{width:"100%",borderCollapse:"collapse",fontSize:11,minWidth:700}}>
+      <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:900}}>
         <thead>
           <tr style={{background:"var(--surface-2)"}}>
-            <th style={th({minWidth:190,textAlign:"left"})}>Item</th>
-            <th style={th({textAlign:"right"})}>Qty</th>
+            <th style={th({minWidth:220,textAlign:"left"})}>Item</th>
+            <th style={th({textAlign:"right",minWidth:60})}>Qty</th>
             {VENDORS.map(v => (
-              <th key={v.id} style={th({textAlign:"right",minWidth:88})}>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"flex-end",gap:4}}>
+              <th key={v.id} style={th({textAlign:"left",minWidth:110})}>
+                <div style={{display:"flex",alignItems:"center",gap:4}}>
                   <span>{v.name.split(" ")[0]}</span>
-                  {RED_FLAG_VIDS.has(v.id) && <span style={{width:6,height:6,borderRadius:"50%",background:"#e24b4a",display:"inline-block"}} title="Has risk flags"/>}
+                  {RED_FLAG_VIDS.has(v.id) && <span style={{width:6,height:6,borderRadius:"50%",background:"#e24b4a",display:"inline-block",flexShrink:0}} title="Has risk flags"/>}
                 </div>
-                <div style={{fontSize:9,color:"var(--text-muted)",fontWeight:400}}>{v.id}</div>
+                <div style={{fontSize:10,color:"var(--text-muted)",fontWeight:400,marginTop:1}}>{v.id}</div>
               </th>
             ))}
           </tr>
@@ -137,20 +137,20 @@ function BidTable({ filter }) {
             const minP = Math.min(...prices), maxP = Math.max(...prices);
             return (
               <tr key={item.id} style={{borderBottom:"0.5px solid var(--border)"}}>
-                <td style={{padding:"7px 10px",verticalAlign:"top"}}>
+                <td style={{padding:"8px 12px",verticalAlign:"top",minWidth:220,textAlign:"left"}}>
                   <div style={{fontSize:10,color:"var(--text-muted)",marginBottom:2}}>{item.id}</div>
-                  <div style={{lineHeight:1.4,color:"var(--text-primary)",maxWidth:185}}>{item.description}</div>
-                  <span style={{display:"inline-block",fontSize:9,padding:"1px 5px",borderRadius:3,background:"var(--surface-0)",color:"var(--text-muted)",border:"0.5px solid var(--border)",marginTop:3}}>{item.category}</span>
+                  <div style={{lineHeight:1.45,color:"var(--text-primary)",textAlign:"left"}}>{item.description}</div>
+                  <span style={{display:"inline-block",fontSize:9,padding:"1px 5px",borderRadius:3,background:"var(--surface-0)",color:"var(--text-muted)",border:"0.5px solid var(--border)",marginTop:4}}>{item.category}</span>
                 </td>
-                <td style={{padding:"7px 10px",textAlign:"right",color:"var(--text-muted)",verticalAlign:"top"}}>{item.quantity} {item.unit}</td>
+                <td style={{padding:"8px 10px",textAlign:"right",color:"var(--text-muted)",verticalAlign:"top",whiteSpace:"nowrap"}}>{item.quantity} {item.unit}</td>
                 {VENDORS.map(v => {
                   const b = item.bids[v.id];
-                  if (!b) return <td key={v.id} style={{padding:"7px 10px",textAlign:"center",color:"var(--text-muted)",fontStyle:"italic",verticalAlign:"top"}}>—</td>;
+                  if (!b) return <td key={v.id} style={{padding:"8px 12px",textAlign:"center",color:"var(--text-muted)",fontStyle:"italic",verticalAlign:"top",minWidth:110}}>—</td>;
                   const color = b.unit_price===minP ? "#3b6d11" : b.unit_price===maxP&&prices.length>1 ? "#a32d2d" : "var(--text-primary)";
                   return (
-                    <td key={v.id} style={{padding:"7px 10px",textAlign:"right",verticalAlign:"top",fontVariantNumeric:"tabular-nums",color}}>
-                      <div style={{fontWeight: b.unit_price===minP ? 500 : 400}}>₹{b.unit_price.toLocaleString("en-IN")}</div>
-                      <div style={{fontSize:9,color:"var(--text-muted)"}}>{b.lead_time_days}d · {b.warranty_years}yr</div>
+                    <td key={v.id} style={{padding:"8px 12px",textAlign:"right",verticalAlign:"top",fontVariantNumeric:"tabular-nums",color,minWidth:110}}>
+                      <div style={{fontWeight: b.unit_price===minP ? 500 : 400,whiteSpace:"nowrap"}}>₹{b.unit_price.toLocaleString("en-IN")}</div>
+                      <div style={{fontSize:10,color:"var(--text-muted)",marginTop:2,whiteSpace:"nowrap"}}>{b.lead_time_days}d · {b.warranty_years}yr</div>
                     </td>
                   );
                 })}
@@ -164,7 +164,7 @@ function BidTable({ filter }) {
 }
 
 function th(extra={}) {
-  return {padding:"8px 10px",fontWeight:500,fontSize:11,color:"var(--text-secondary)",borderBottom:"0.5px solid var(--border)",whiteSpace:"nowrap",position:"sticky",top:49,background:"var(--surface-2)",...extra};
+  return {padding:"10px 12px",fontWeight:500,fontSize:12,color:"var(--text-secondary)",borderBottom:"0.5px solid var(--border)",whiteSpace:"nowrap",position:"sticky",top:49,background:"var(--surface-2)",...extra};
 }
 
 function AITable({ data }) {
@@ -244,6 +244,36 @@ export default function App() {
   const chatRef = useRef(null);
 
   useEffect(() => {
+    const style = document.createElement("style");
+    style.id = "aerchain-theme";
+    style.textContent = `
+      :root {
+        --surface-0: #f4f4f2;
+        --surface-1: #eeecea;
+        --surface-2: #ffffff;
+        --text-primary: #1a1a18;
+        --text-secondary: #5f5e5a;
+        --text-muted: #888780;
+        --border: rgba(0,0,0,0.09);
+        --border-strong: rgba(0,0,0,0.16);
+        --bg-accent: #e6f1fb;
+        --text-accent: #185fa5;
+        --border-accent: #85b7eb;
+        --fill-accent: #378add;
+        --radius: 7px;
+        --bg-warning: #faeeda;
+        --text-warning: #854f0b;
+        --border-warning: rgba(186,117,23,0.4);
+        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      body { margin: 0; overflow: hidden; }
+      @keyframes pulse { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
+    `;
+    if (!document.getElementById("aerchain-theme")) document.head.appendChild(style);
+    return () => { document.getElementById("aerchain-theme")?.remove(); };
+  }, []);
+
+  useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
   }, [messages, loading]);
 
@@ -282,19 +312,19 @@ export default function App() {
   const handleKey = (e) => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); send(input); } };
 
   return (
-    <div style={{display:"grid",gridTemplateColumns:"1fr 400px",gridTemplateRows:"52px 1fr",height:"100vh",background:"var(--surface-0)",fontFamily:"var(--font-sans)"}}>
+    <div style={{display:"grid",gridTemplateColumns:"55% 45%",gridTemplateRows:"52px 1fr",height:"100vh",background:"var(--surface-0)",fontFamily:"var(--font-sans)",color:"var(--text-primary)"}}>
 
       {/* Topbar */}
       <div style={{gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 20px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)"}}>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <div style={{fontSize:15,fontWeight:500,letterSpacing:-0.3}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,minWidth:0}}>
+          <div style={{fontSize:15,fontWeight:500,letterSpacing:-0.3,whiteSpace:"nowrap"}}>
             aerchain <span style={{color:"var(--text-accent)"}}>analyst</span>
           </div>
-          <div style={{fontSize:11,color:"var(--text-secondary)",background:"var(--surface-1)",border:"0.5px solid var(--border)",borderRadius:"var(--radius)",padding:"3px 8px"}}>
+          <div style={{fontSize:11,color:"var(--text-secondary)",background:"var(--surface-1)",border:"0.5px solid var(--border)",borderRadius:"var(--radius)",padding:"3px 8px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
             RFQ-2026-IT-0047 · Nexova Technologies · IT Hardware
           </div>
         </div>
-        <div style={{display:"flex",gap:8}}>
+        <div style={{display:"flex",gap:8,flexShrink:0}}>
           <button onClick={downloadCSV} style={{fontSize:12,padding:"5px 10px",border:"0.5px solid var(--border-strong)",borderRadius:"var(--radius)",background:"var(--surface-1)",color:"var(--text-secondary)",cursor:"pointer"}}>
             ↓ Export CSV
           </button>
@@ -305,9 +335,9 @@ export default function App() {
       </div>
 
       {/* Left — Comparison Table */}
-      <div style={{overflow:"auto",borderRight:"0.5px solid var(--border)"}}>
+      <div style={{overflow:"auto",borderRight:"0.5px solid var(--border)",background:"var(--surface-0)",minWidth:0}}>
         {/* Stats */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,padding:"10px 16px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)"}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,padding:"10px 14px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)"}}>
           <StatCard value="5" label="Vendors"/>
           <StatCard value="30" label="Line items"/>
           <StatCard value={`₹${(TOTALS[lowestVendor[0]]/100000).toFixed(0)}L`} label="Lowest total bid"/>
@@ -315,9 +345,9 @@ export default function App() {
         </div>
 
         {/* Filter tabs */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 16px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)",position:"sticky",top:0,zIndex:10}}>
-          <div style={{fontSize:13,fontWeight:500}}>Side-by-side comparison</div>
-          <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,padding:"10px 14px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)",position:"sticky",top:0,zIndex:10}}>
+          <div style={{fontSize:13,fontWeight:500,color:"var(--text-primary)",whiteSpace:"nowrap"}}>Side-by-side comparison</div>
+          <div style={{display:"flex",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}}>
             {["All",...CATS].map(cat => (
               <button key={cat} onClick={()=>setCatFilter(cat)} style={{
                 fontSize:11,padding:"3px 8px",borderRadius:"var(--radius)",cursor:"pointer",
@@ -333,16 +363,16 @@ export default function App() {
       </div>
 
       {/* Right — Chat */}
-      <div style={{display:"flex",flexDirection:"column",background:"var(--surface-1)"}}>
-        <div style={{fontSize:10,fontWeight:600,color:"var(--text-muted)",padding:"10px 14px 4px",letterSpacing:0.5,textTransform:"uppercase"}}>
+      <div style={{display:"flex",flexDirection:"column",background:"var(--surface-1)",minWidth:0,overflow:"hidden"}}>
+        <div style={{fontSize:10,fontWeight:600,color:"var(--text-muted)",padding:"10px 14px 6px",letterSpacing:0.5,textTransform:"uppercase",textAlign:"left"}}>
           AI analyst
         </div>
 
-        <div ref={chatRef} style={{flex:1,overflowY:"auto",padding:12,display:"flex",flexDirection:"column",gap:10}}>
+        <div ref={chatRef} style={{flex:1,overflowY:"auto",padding:"8px 14px 12px",display:"flex",flexDirection:"column",gap:10,alignItems:"stretch"}}>
           {messages.length === 0 && (
-            <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flex:1,gap:8,color:"var(--text-muted)",fontSize:13,textAlign:"center",padding:20}}>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",justifyContent:"center",flex:1,gap:6,color:"var(--text-muted)",fontSize:13,textAlign:"left",padding:"12px 4px"}}>
               <div style={{fontSize:28}}>💬</div>
-              <div>Ask anything about the bids</div>
+              <div style={{color:"var(--text-secondary)"}}>Ask anything about the bids</div>
               <div style={{fontSize:11}}>Prices · risks · charts · recommendations</div>
             </div>
           )}
@@ -350,27 +380,27 @@ export default function App() {
           {messages.map((m, i) => {
             if (m.role === "user") {
               return (
-                <div key={i} style={{alignSelf:"flex-end",background:"var(--bg-accent)",color:"var(--text-primary)",borderRadius:"12px 12px 2px 12px",padding:"8px 12px",fontSize:13,maxWidth:"85%"}}>
+                <div key={i} style={{alignSelf:"flex-end",background:"var(--bg-accent)",color:"var(--text-primary)",borderRadius:"12px 12px 2px 12px",padding:"9px 13px",fontSize:13,lineHeight:1.45,maxWidth:"88%",textAlign:"left",border:"0.5px solid var(--border-accent)"}}>
                   {m.text}
                 </div>
               );
             }
             const p = m.parsed;
             return (
-              <div key={i} style={{background:"var(--surface-2)",border:"0.5px solid var(--border)",borderRadius:"2px 12px 12px 12px",padding:"10px 12px"}}>
-                <div style={{fontSize:13,lineHeight:1.55,color:"var(--text-primary)",marginBottom:p.data||p.flags?.length?8:0}}>{p.summary}</div>
+              <div key={i} style={{alignSelf:"flex-start",width:"100%",maxWidth:"100%",boxSizing:"border-box",background:"var(--surface-2)",border:"0.5px solid var(--border)",borderRadius:"2px 12px 12px 12px",padding:"11px 13px",textAlign:"left"}}>
+                <div style={{fontSize:13,lineHeight:1.55,color:"var(--text-primary)",textAlign:"left",marginBottom:p.data||p.flags?.length?8:0}}>{p.summary}</div>
                 {(p.answer_type==="table"||p.answer_type==="mixed") && <AITable data={p.data}/>}
                 {(p.answer_type==="chart"||p.answer_type==="mixed") && <AIChart data={p.data}/>}
                 {p.flags?.length > 0 && (
                   <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:4}}>
                     {p.flags.map((f,fi)=>(
-                      <div key={fi} style={{fontSize:11,color:"var(--text-warning)",background:"var(--bg-warning)",border:"0.5px solid var(--border-warning)",borderRadius:"var(--radius)",padding:"4px 8px"}}>
+                      <div key={fi} style={{fontSize:11,color:"var(--text-warning)",background:"var(--bg-warning)",border:"0.5px solid var(--border-warning)",borderRadius:"var(--radius)",padding:"4px 8px",textAlign:"left"}}>
                         ⚠ {f}
                       </div>
                     ))}
                   </div>
                 )}
-                <div style={{fontSize:10,color:"var(--text-muted)",marginTop:8,display:"flex",alignItems:"center"}}>
+                <div style={{fontSize:10,color:"var(--text-muted)",marginTop:8,display:"flex",alignItems:"center",textAlign:"left"}}>
                   <ConfidenceDot level={p.confidence}/>{p.confidence} confidence
                 </div>
               </div>
@@ -378,37 +408,36 @@ export default function App() {
           })}
 
           {loading && (
-            <div style={{background:"var(--surface-2)",border:"0.5px solid var(--border)",borderRadius:"2px 12px 12px 12px",padding:"12px 14px",display:"flex",gap:5,alignItems:"center"}}>
+            <div style={{alignSelf:"flex-start",background:"var(--surface-2)",border:"0.5px solid var(--border)",borderRadius:"2px 12px 12px 12px",padding:"12px 14px",display:"flex",gap:5,alignItems:"center"}}>
               {[0,150,300].map(d=>(
                 <span key={d} style={{width:6,height:6,borderRadius:"50%",background:"var(--text-muted)",display:"inline-block",animation:"pulse 1.2s infinite",animationDelay:`${d}ms`}}/>
               ))}
-              <style>{`@keyframes pulse{0%,80%,100%{opacity:.3}40%{opacity:1}}`}</style>
             </div>
           )}
         </div>
 
         {/* Suggestions */}
-        <div style={{padding:"8px 12px 0",display:"flex",flexWrap:"wrap",gap:5}}>
+        <div style={{padding:"8px 14px 0",display:"flex",flexWrap:"wrap",gap:6}}>
           {SUGGESTIONS.map(s=>(
-            <button key={s} onClick={()=>send(s)} style={{fontSize:11,padding:"4px 8px",border:"0.5px solid var(--border-accent)",borderRadius:"var(--radius)",color:"var(--text-accent)",background:"var(--bg-accent)",cursor:"pointer",whiteSpace:"nowrap"}}>
+            <button key={s} onClick={()=>send(s)} style={{fontSize:11,padding:"4px 9px",border:"0.5px solid var(--border-accent)",borderRadius:"var(--radius)",color:"var(--text-accent)",background:"var(--bg-accent)",cursor:"pointer",lineHeight:1.3,textAlign:"left"}}>
               {s}
             </button>
           ))}
         </div>
 
         {/* Input */}
-        <div style={{padding:10,borderTop:"0.5px solid var(--border)",background:"var(--surface-2)",display:"flex",gap:6}}>
+        <div style={{padding:"10px 14px 14px",borderTop:"0.5px solid var(--border)",marginTop:8,background:"var(--surface-2)",display:"flex",gap:8,alignItems:"center"}}>
           <input
             value={input}
             onChange={e=>setInput(e.target.value)}
             onKeyDown={handleKey}
             placeholder="Ask about vendors, prices, risks..."
-            style={{flex:1,fontSize:13,padding:"8px 10px",border:"0.5px solid var(--border-strong)",borderRadius:"var(--radius)",background:"var(--surface-1)",color:"var(--text-primary)",outline:"none",fontFamily:"var(--font-sans)"}}
+            style={{flex:1,width:"100%",fontSize:13,padding:"10px 12px",border:"0.5px solid var(--border-strong)",borderRadius:"var(--radius)",background:"var(--surface-0)",color:"var(--text-primary)",outline:"none",fontFamily:"var(--font-sans)",boxSizing:"border-box"}}
           />
           <button
             onClick={()=>send(input)}
             disabled={loading}
-            style={{width:36,height:36,borderRadius:"var(--radius)",border:"none",background:"var(--fill-accent)",color:"#fff",cursor:loading?"not-allowed":"pointer",fontSize:16,opacity:loading?0.4:1,flexShrink:0}}
+            style={{width:38,height:38,borderRadius:"var(--radius)",border:"none",background:"var(--fill-accent)",color:"#fff",cursor:loading?"not-allowed":"pointer",fontSize:16,opacity:loading?0.4:1,flexShrink:0}}
           >
             →
           </button>
