@@ -662,7 +662,7 @@ export default function App() {
 
       {/* Right — Chat */}
       <div style={{
-        display:"flex",flexDirection:"column",overflow:"hidden",
+        display:"flex",flexDirection:"column",overflow:"hidden",height:"100%",
         background:"#ffffff",width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,
       }}>
         <div style={{
