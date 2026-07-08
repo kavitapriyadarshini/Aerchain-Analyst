@@ -35,7 +35,7 @@ QUESTIONNAIRE:\n${DS.questionnaire.questions.map(q=>{const a=VENDORS.map(v=>`${v
 DOCS:\n${DS.attached_documents.map(d=>`${d.vendor_id}|${d.doc_type}:${d.summary}`).join('\n')}
 RED FLAGS:\n${DS.red_flags.map(r=>`⚠ ${r.vendor_id}: ${r.flag}`).join('\n')}
 PRE-COMPUTED:\n${facts}
-RESPOND with ONLY valid JSON — no markdown, no text outside:
+RESPOND with ONLY a raw JSON object. No markdown fences. No code blocks. No text before or after. Your response must start with { and end with }:
 {"answer_type":"text"|"table"|"chart"|"mixed","summary":"2-3 sentence insight","data":null|{...},"flags":["warnings"],"confidence":"high"|"medium"|"low"}
 table data: {"columns":[...],"rows":[[...],...]}
 chart data: {"chart_type":"bar"|"pie","title":"...","series":[{"name":"...","data":[{"label":"...","value":number}]}]}
