@@ -100,6 +100,18 @@ function downloadCSV() {
   const a = document.createElement("a"); a.href=url; a.download="aerchain_bid_comparison.csv"; a.click();
 }
 
+function extractJSON(text) {
+  try { return JSON.parse(text.trim()); } catch {}
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenced) { try { return JSON.parse(fenced[1].trim()); } catch {} }
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    try { return JSON.parse(text.slice(start, end + 1)); } catch {}
+  }
+  return { answer_type: "text", summary: text, data: null, flags: [], confidence: "low" };
+}
+
 // ── Components ──────────────────────────────────────────────────────────────
 
 function StatCell({ value, label, last }) {
@@ -203,7 +215,7 @@ function th(extra={}) {
   return {
     padding:"5px 10px",fontWeight:500,fontSize:11,color:"#5f5e5a",
     borderBottom:"1px solid #e5e5e3",whiteSpace:"nowrap",
-    position:"sticky",top:46,zIndex:5,background:"#f0efec",...extra,
+    position:"sticky",top:0,zIndex:5,background:"#f0efec",...extra,
   };
 }
 
@@ -478,10 +490,7 @@ export default function App() {
       });
       const raw = await res.json();
       const text = raw.content?.[0]?.text?.trim() || "";
-      const clean = text.replace(/^```json\s*/i,"").replace(/```\s*$/i,"").trim();
-      let parsed;
-      try { parsed = JSON.parse(clean); }
-      catch { parsed = { answer_type:"text", summary: text || "Could not parse response.", data:null, flags:[], confidence:"low" }; }
+      let parsed = extractJSON(text);
 
       setHistory([...newHistory, { role:"assistant", content:text }]);
       setMessages(prev => [...prev, { role:"ai", parsed }]);
@@ -543,15 +552,19 @@ export default function App() {
         </div>
       )}
 
-      <div style={{display:"flex",flexDirection:"row",flex:1,minHeight:0,overflow:"hidden"}}>
+      <div style={{
+        flex:1,display:"flex",overflow:"hidden",minHeight:0,
+        height:"calc(100vh - 48px)",
+      }}>
       {/* Left — Comparison Table */}
       <div style={{
-        flex:1,overflow:"auto",minWidth:400,
-        background:"#fafaf9",margin:0,padding:0,
+        flex:1,height:"100%",overflow:"hidden",display:"flex",flexDirection:"column",
+        minWidth:400,background:"#fafaf9",margin:0,padding:0,
       }}>
         {showOnboarding && (
           <div style={{
-            background:"#fff",borderBottom:"1px solid #f0efec",padding: showOnboardingDetail ? "10px 16px" : "8px 16px",
+            flexShrink:0,background:"#fff",borderBottom:"1px solid #f0efec",
+            padding: showOnboardingDetail ? "10px 16px" : "8px 16px",
             fontSize:12,lineHeight:1.6,color:"#111",
           }}>
             {!showOnboardingDetail ? (
@@ -608,7 +621,7 @@ export default function App() {
         )}
 
         {/* Stats */}
-        <div style={{display:"flex",width:"100%",borderBottom:"1px solid #f0efec",background:"#fff"}}>
+        <div style={{display:"flex",width:"100%",borderBottom:"1px solid #f0efec",background:"#fff",flexShrink:0}}>
           <StatCell value="5" label="Vendors"/>
           <StatCell value="30" label="Line items"/>
           <StatCell value={`₹${(TOTALS[lowestVendor[0]]/100000).toFixed(0)}L`} label="Lowest total bid"/>
@@ -618,8 +631,7 @@ export default function App() {
         {/* Filter tabs */}
         <div style={{
           display:"flex",alignItems:"center",gap:8,padding:"10px 14px",
-          borderBottom:"1px solid #e5e5e3",background:"#fff",
-          position:"sticky",top:0,zIndex:10,overflowX:"auto",
+          borderBottom:"1px solid #e5e5e3",background:"#fff",flexShrink:0,overflowX:"auto",
         }}>
           {["All",...CATS].map(cat => {
             const active = catFilter === cat;
@@ -635,7 +647,9 @@ export default function App() {
           })}
         </div>
 
-        <BidTable filter={catFilter}/>
+        <div style={{flex:1,overflowY:"auto",overflowX:"auto",minHeight:0}}>
+          <BidTable filter={catFilter}/>
+        </div>
       </div>
 
       {/* Drag handle */}
@@ -649,7 +663,7 @@ export default function App() {
 
       {/* Right — Chat */}
       <div style={{
-        display:"flex",flexDirection:"column",height:"calc(100vh - 48px)",overflow:"hidden",
+        display:"flex",flexDirection:"column",height:"100%",overflow:"hidden",
         background:"#ffffff",width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,
       }}>
         <div style={{
@@ -726,7 +740,7 @@ export default function App() {
         </div>
 
         {/* Suggestions */}
-        <div style={{padding:"8px 14px 0",display:"flex",flexWrap:"wrap",gap:6,flexShrink:0}}>
+        <div style={{padding:"6px 10px 0",display:"flex",flexWrap:"wrap",gap:6,flexShrink:0}}>
           {SUGGESTIONS.map(s=>(
             <button key={s} onClick={()=>send(s)} style={{
               fontSize:10,padding:"4px 10px",border:"1px solid #85b7eb",borderRadius:999,
