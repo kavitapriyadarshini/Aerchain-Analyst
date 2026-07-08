@@ -102,11 +102,14 @@ function downloadCSV() {
 
 // ── Components ──────────────────────────────────────────────────────────────
 
-function StatCard({ value, label }) {
+function StatCell({ value, label, last }) {
   return (
-    <div style={{background:"var(--surface-1)",borderRadius:"var(--radius)",padding:"8px 10px",border:"0.5px solid var(--border)",minWidth:0}}>
-      <div style={{fontSize:18,fontWeight:500,color:"var(--text-primary)",lineHeight:1.15,whiteSpace:"nowrap"}}>{value}</div>
-      <div style={{fontSize:10,color:"var(--text-muted)",marginTop:3,lineHeight:1.2}}>{label}</div>
+    <div style={{
+      flex:1,minWidth:0,padding:"14px 16px",background:"#fff",
+      borderRight: last ? "none" : "1px solid #e5e5e3",
+    }}>
+      <div style={{fontSize:24,fontWeight:600,color:"#111",lineHeight:1.1,fontVariantNumeric:"tabular-nums"}}>{value}</div>
+      <div style={{fontSize:11,color:"#888780",marginTop:4}}>{label}</div>
     </div>
   );
 }
@@ -116,67 +119,116 @@ function BidTable({ filter }) {
   return (
     <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:900}}>
       <thead>
-        <tr style={{background:"var(--surface-2)"}}>
+        <tr>
           <th style={th({minWidth:220,textAlign:"left"})}>Item</th>
-          <th style={th({textAlign:"right",minWidth:60})}>Qty</th>
-          {VENDORS.map(v => (
-            <th key={v.id} style={th({textAlign:"left",minWidth:110})}>
-              <div style={{display:"flex",alignItems:"center",gap:4}}>
-                <span>{v.name.split(" ")[0]}</span>
-                {RED_FLAG_VIDS.has(v.id) && <span style={{width:6,height:6,borderRadius:"50%",background:"#e24b4a",display:"inline-block",flexShrink:0}} title="Has risk flags"/>}
-              </div>
-              <div style={{fontSize:10,color:"var(--text-muted)",fontWeight:400,marginTop:1}}>{v.id}</div>
-            </th>
-          ))}
-        </tr>
-      </thead>
-        <tbody>
-          {items.map(item => {
-            const prices = VENDORS.map(v => item.bids[v.id]?.unit_price).filter(Boolean);
-            const minP = Math.min(...prices), maxP = Math.max(...prices);
+          <th style={th({textAlign:"right",minWidth:56})}>Qty</th>
+          {VENDORS.map(v => {
+            const flagCount = DS.red_flags.filter(r => r.vendor_id === v.id).length;
             return (
-              <tr key={item.id} style={{borderBottom:"0.5px solid var(--border)"}}>
-                <td style={{padding:"8px 12px",verticalAlign:"top",minWidth:220,textAlign:"left"}}>
-                  <div style={{fontSize:10,color:"var(--text-muted)",marginBottom:2}}>{item.id}</div>
-                  <div style={{lineHeight:1.45,color:"var(--text-primary)",textAlign:"left"}}>{item.description}</div>
-                  <span style={{display:"inline-block",fontSize:9,padding:"1px 5px",borderRadius:3,background:"var(--surface-0)",color:"var(--text-muted)",border:"0.5px solid var(--border)",marginTop:4}}>{item.category}</span>
-                </td>
-                <td style={{padding:"8px 10px",textAlign:"right",color:"var(--text-muted)",verticalAlign:"top",whiteSpace:"nowrap"}}>{item.quantity} {item.unit}</td>
-                {VENDORS.map(v => {
-                  const b = item.bids[v.id];
-                  if (!b) return <td key={v.id} style={{padding:"8px 12px",textAlign:"center",color:"var(--text-muted)",fontStyle:"italic",verticalAlign:"top",minWidth:110}}>—</td>;
-                  const color = b.unit_price===minP ? "#3b6d11" : b.unit_price===maxP&&prices.length>1 ? "#a32d2d" : "var(--text-primary)";
-                  return (
-                    <td key={v.id} style={{padding:"8px 12px",textAlign:"right",verticalAlign:"top",fontVariantNumeric:"tabular-nums",color,minWidth:110}}>
-                      <div style={{fontWeight: b.unit_price===minP ? 500 : 400,whiteSpace:"nowrap"}}>₹{b.unit_price.toLocaleString("en-IN")}</div>
-                      <div style={{fontSize:10,color:"var(--text-muted)",marginTop:2,whiteSpace:"nowrap"}}>{b.lead_time_days}d · {b.warranty_years}yr</div>
-                    </td>
-                  );
-                })}
-              </tr>
+              <th key={v.id} style={th({textAlign:"left",minWidth:110})}>
+                <div style={{display:"flex",alignItems:"center",gap:5}}>
+                  <span style={{fontWeight:700,fontSize:12,color:"#111"}}>{v.name.split(" ")[0]}</span>
+                  {flagCount > 0 && (
+                    <span
+                      title={`${flagCount} risk flag${flagCount === 1 ? "" : "s"}`}
+                      style={{
+                        width:16,height:16,borderRadius:"50%",background:"#e24b4a",
+                        color:"#fff",fontSize:10,fontWeight:600,lineHeight:"16px",
+                        display:"inline-flex",alignItems:"center",justifyContent:"center",
+                        flexShrink:0,cursor:"default",
+                      }}
+                    >
+                      {flagCount}
+                    </span>
+                  )}
+                </div>
+                <div style={{fontSize:10,color:"#888780",fontWeight:400,marginTop:1}}>{v.id}</div>
+              </th>
             );
           })}
-        </tbody>
-      </table>
+        </tr>
+      </thead>
+      <tbody>
+        {items.map((item, idx) => {
+          const prices = VENDORS.map(v => item.bids[v.id]?.unit_price).filter(Boolean);
+          const minP = Math.min(...prices), maxP = Math.max(...prices);
+          const rowBg = idx % 2 === 0 ? "#fff" : "#fafaf9";
+          return (
+            <tr key={item.id} style={{background:rowBg,borderBottom:"1px solid #e5e5e3"}}>
+              <td style={{padding:"10px 14px",verticalAlign:"top",minWidth:220,textAlign:"left"}}>
+                <div style={{fontSize:10,color:"#888780",marginBottom:2}}>{item.id}</div>
+                <div style={{fontSize:12,lineHeight:1.45,color:"#111"}}>{item.description}</div>
+                <span style={{
+                  display:"inline-block",fontSize:9,padding:"1px 6px",borderRadius:10,
+                  background:"#f0efec",color:"#5f5e5a",marginTop:5,
+                }}>{item.category}</span>
+              </td>
+              <td style={{padding:"10px 12px",textAlign:"right",color:"#888780",verticalAlign:"top",whiteSpace:"nowrap",fontSize:12}}>
+                {item.quantity} {item.unit}
+              </td>
+              {VENDORS.map(v => {
+                const b = item.bids[v.id];
+                if (!b) {
+                  return (
+                    <td key={v.id} style={{padding:"10px 14px",textAlign:"center",color:"#888780",verticalAlign:"top",minWidth:110}}>
+                      —
+                    </td>
+                  );
+                }
+                const isLow = b.unit_price === minP;
+                const isHigh = b.unit_price === maxP && prices.length > 1;
+                const color = isLow ? "#2d6a1f" : isHigh ? "#991b1b" : "#111";
+                return (
+                  <td key={v.id} style={{
+                    padding:"10px 14px",textAlign:"right",verticalAlign:"top",
+                    fontVariantNumeric:"tabular-nums",color,minWidth:110,
+                  }}>
+                    <div style={{fontSize:12,fontWeight:isLow ? 700 : 400,whiteSpace:"nowrap"}}>
+                      ₹{b.unit_price.toLocaleString("en-IN")}
+                    </div>
+                    <div style={{fontSize:10,color:"#888780",marginTop:2,whiteSpace:"nowrap"}}>
+                      {b.lead_time_days}d · {b.warranty_years}yr
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
 function th(extra={}) {
-  return {padding:"10px 12px",fontWeight:500,fontSize:12,color:"var(--text-secondary)",borderBottom:"0.5px solid var(--border)",whiteSpace:"nowrap",background:"var(--surface-2)",...extra};
+  return {
+    padding:"10px 14px",fontWeight:500,fontSize:11,color:"#5f5e5a",
+    borderBottom:"1px solid #e5e5e3",whiteSpace:"nowrap",
+    position:"sticky",top:46,zIndex:5,background:"#f0efec",...extra,
+  };
 }
 
 function AITable({ data }) {
   if (!data?.columns) return null;
   return (
     <div style={{overflowX:"auto",marginTop:8}}>
-      <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+      <table style={{width:"100%",borderCollapse:"collapse",fontSize:10,border:"none"}}>
         <thead>
-          <tr>{data.columns.map((c,i)=><th key={i} style={{padding:"5px 8px",textAlign:"left",fontWeight:500,color:"var(--text-secondary)",borderBottom:"0.5px solid var(--border)",background:"var(--surface-0)",fontSize:10,whiteSpace:"nowrap"}}>{c}</th>)}</tr>
+          <tr>
+            {data.columns.map((c,i)=>(
+              <th key={i} style={{
+                padding:"5px 8px",textAlign:"left",fontWeight:600,color:"#5f5e5a",
+                borderBottom:"1px solid #e5e5e3",background:"transparent",fontSize:10,whiteSpace:"nowrap",
+              }}>{c}</th>
+            ))}
+          </tr>
         </thead>
         <tbody>
           {(data.rows||[]).map((row,i)=>(
-            <tr key={i} style={{borderBottom:"0.5px solid var(--border)"}}>
-              {row.map((cell,j)=><td key={j} style={{padding:"5px 8px",color:"var(--text-primary)",fontSize:11}}>{cell}</td>)}
+            <tr key={i} style={{background: i%2===0 ? "#fff" : "#fafaf9",borderBottom:"1px solid #e5e5e3"}}>
+              {row.map((cell,j)=>(
+                <td key={j} style={{padding:"5px 8px",color:"#111",fontSize:10}}>{cell}</td>
+              ))}
             </tr>
           ))}
         </tbody>
@@ -214,12 +266,20 @@ function AIChart({ data }) {
     <div style={{height:200,marginTop:8}}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{top:4,right:8,left:0,bottom:4}}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false}/>
-          <XAxis dataKey="label" tick={{fontSize:10,fill:"var(--text-muted)"}} axisLine={false} tickLine={false}/>
-          <YAxis tick={{fontSize:10,fill:"var(--text-muted)"}} axisLine={false} tickLine={false} tickFormatter={v=>v>=100000?`${(v/100000).toFixed(0)}L`:v}/>
-          <Tooltip formatter={(v,name)=>[v.toLocaleString("en-IN"), name]} contentStyle={{fontSize:11,border:"0.5px solid var(--border)",borderRadius:6,background:"var(--surface-2)"}}/>
-          {series.length>1 && <Legend wrapperStyle={{fontSize:11}}/>}
-          {series.map((s,i)=><Bar key={s.name} dataKey={s.name} fill={CHART_COLORS[i%5]} radius={[3,3,0,0]} maxBarSize={40}/>)}
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e3" vertical={false}/>
+          <XAxis dataKey="label" tick={{fontSize:10,fill:"#888780"}} axisLine={false} tickLine={false}/>
+          <YAxis tick={{fontSize:10,fill:"#888780"}} axisLine={false} tickLine={false} tickFormatter={v=>v>=100000?`${(v/100000).toFixed(0)}L`:v}/>
+          <Tooltip formatter={(v,name)=>[v.toLocaleString("en-IN"), name]} contentStyle={{fontSize:11,border:"1px solid #e5e5e3",borderRadius:6,background:"#fff",boxShadow:"none"}}/>
+          {series.length>1 && <Legend wrapperStyle={{fontSize:10}}/>}
+          {series.map((s,i)=>(
+            <Bar
+              key={s.name}
+              dataKey={s.name}
+              fill={series.length === 1 ? "#378add" : CHART_COLORS[i%5]}
+              radius={[3,3,0,0]}
+              maxBarSize={40}
+            />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -227,7 +287,7 @@ function AIChart({ data }) {
 }
 
 function ConfidenceDot({ level }) {
-  const color = level==="high"?"#639922":level==="medium"?"#ef9f27":"#e24b4a";
+  const color = level==="high" ? "#22c55e" : level==="medium" ? "#f59e0b" : "#ef4444";
   return <span style={{display:"inline-block",width:6,height:6,borderRadius:"50%",background:color,marginRight:5,verticalAlign:"middle"}}/>;
 }
 
@@ -239,32 +299,19 @@ export default function App() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("aerchain_onboarded"));
   const chatRef = useRef(null);
 
   useEffect(() => {
     const style = document.createElement("style");
     style.id = "aerchain-theme";
     style.textContent = `
-      :root {
-        --surface-0: #f4f4f2;
-        --surface-1: #eeecea;
-        --surface-2: #ffffff;
-        --text-primary: #1a1a18;
-        --text-secondary: #5f5e5a;
-        --text-muted: #888780;
-        --border: rgba(0,0,0,0.09);
-        --border-strong: rgba(0,0,0,0.16);
-        --bg-accent: #e6f1fb;
-        --text-accent: #185fa5;
-        --border-accent: #85b7eb;
-        --fill-accent: #378add;
-        --radius: 7px;
-        --bg-warning: #faeeda;
-        --text-warning: #854f0b;
-        --border-warning: rgba(186,117,23,0.4);
-        --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-      body { margin: 0; overflow: hidden; }
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; overflow: hidden; height: 100%; width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      #root { margin: 0 !important; padding: 0 !important; height: 100vh !important; width: 100% !important; max-width: none !important; text-align: left !important; border: none !important; display: block !important; }
+      ::-webkit-scrollbar { width: 4px; height: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #d1d1ce; border-radius: 4px; }
       @keyframes pulse { 0%,80%,100%{opacity:.3} 40%{opacity:1} }
     `;
     if (!document.getElementById("aerchain-theme")) document.head.appendChild(style);
@@ -310,67 +357,133 @@ export default function App() {
   const handleKey = (e) => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); send(input); } };
 
   return (
-    <div style={{display:"grid",gridTemplateColumns:"55% 45%",gridTemplateRows:"52px 1fr",height:"100vh",background:"var(--surface-0)",fontFamily:"var(--font-sans)",color:"var(--text-primary)"}}>
+    <div style={{
+      display:"grid",gridTemplateColumns:"1fr 420px",gridTemplateRows:"48px 1fr",
+      height:"100vh",width:"100vw",margin:0,padding:0,overflow:"hidden",
+      background:"#fafaf9",fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",color:"#111",
+    }}>
 
       {/* Topbar */}
-      <div style={{gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0 20px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)"}}>
+      <div style={{
+        gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"space-between",
+        height:48,padding:"0 16px",margin:0,background:"#0f0f0f",borderRadius:0,
+      }}>
         <div style={{display:"flex",alignItems:"center",gap:12,minWidth:0}}>
-          <div style={{fontSize:15,fontWeight:500,letterSpacing:-0.3,whiteSpace:"nowrap"}}>
-            aerchain <span style={{color:"var(--text-accent)"}}>analyst</span>
+          <div style={{fontSize:15,fontWeight:500,letterSpacing:-0.2,whiteSpace:"nowrap",color:"#fff"}}>
+            aerchain <span style={{color:"#378add"}}>analyst</span>
           </div>
-          <div style={{fontSize:11,color:"var(--text-secondary)",background:"var(--surface-1)",border:"0.5px solid var(--border)",borderRadius:"var(--radius)",padding:"3px 8px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
-            RFQ-2026-IT-0047 · Nexova Technologies · IT Hardware
+          <div style={{
+            fontSize:11,color:"#a1a1a1",background:"#1f1f1f",border:"1px solid #2a2a2a",
+            borderRadius:999,padding:"3px 10px",whiteSpace:"nowrap",
+          }}>
+            RFQ-2026-IT-0047
           </div>
         </div>
         <div style={{display:"flex",gap:8,flexShrink:0}}>
-          <button onClick={downloadCSV} style={{fontSize:12,padding:"5px 10px",border:"0.5px solid var(--border-strong)",borderRadius:"var(--radius)",background:"var(--surface-1)",color:"var(--text-secondary)",cursor:"pointer"}}>
-            ↓ Export CSV
+          <button onClick={downloadCSV} style={{
+            fontSize:12,padding:"5px 10px",border:"1px solid #3a3a3a",borderRadius:6,
+            background:"transparent",color:"#cfcfcf",cursor:"pointer",
+          }}>
+            Export CSV
           </button>
-          <button onClick={()=>window.print()} style={{fontSize:12,padding:"5px 10px",border:"0.5px solid var(--border-strong)",borderRadius:"var(--radius)",background:"var(--surface-1)",color:"var(--text-secondary)",cursor:"pointer"}}>
-            ↓ Export PDF
+          <button onClick={()=>window.print()} style={{
+            fontSize:12,padding:"5px 10px",border:"1px solid #3a3a3a",borderRadius:6,
+            background:"transparent",color:"#cfcfcf",cursor:"pointer",
+          }}>
+            Export PDF
           </button>
         </div>
       </div>
 
       {/* Left — Comparison Table */}
-      <div style={{overflowY:"auto",overflowX:"auto",borderRight:"0.5px solid var(--border)",background:"var(--surface-0)",minWidth:0,minHeight:0}}>
-        {/* Stats — scrolls with content, not sticky */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,padding:"10px 14px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)"}}>
-          <StatCard value="5" label="Vendors"/>
-          <StatCard value="30" label="Line items"/>
-          <StatCard value={`₹${(TOTALS[lowestVendor[0]]/100000).toFixed(0)}L`} label="Lowest total bid"/>
-          <StatCard value="13" label="Risk flags"/>
+      <div style={{
+        overflowY:"auto",overflowX:"auto",borderRight:"1px solid #e5e5e3",
+        background:"#fafaf9",minWidth:0,minHeight:0,margin:0,padding:0,
+      }}>
+        {showOnboarding && (
+          <div style={{
+            position:"relative",background:"#fff",borderLeft:"4px solid #378add",
+            borderBottom:"1px solid #e5e5e3",padding:"12px 16px",fontSize:12,lineHeight:1.6,color:"#111",
+          }}>
+            <button
+              onClick={() => {
+                localStorage.setItem("aerchain_onboarded", "true");
+                setShowOnboarding(false);
+              }}
+              style={{
+                position:"absolute",top:10,right:14,border:"none",background:"transparent",
+                color:"#378add",fontSize:12,cursor:"pointer",padding:0,fontWeight:500,
+              }}
+            >
+              Got it ✓
+            </button>
+            <div style={{fontWeight:600,marginBottom:4,paddingRight:72}}>👋 Welcome to Aerchain Analyst</div>
+            <div style={{color:"#5f5e5a",paddingRight:72}}>
+              Browse the bid comparison table on the left. Filter by category using the tabs above.
+            </div>
+            <ul style={{margin:"8px 0 0",paddingLeft:18,color:"#5f5e5a"}}>
+              <li>Red number badges = risk flags on that vendor (hover to see count)</li>
+              <li>Each price cell shows: Price · Lead time (days) · Warranty (years)</li>
+              <li>Green price = lowest bid for that item · Red price = highest bid</li>
+              <li>Ask the AI analyst anything in the chat on the right →</li>
+            </ul>
+          </div>
+        )}
+
+        {/* Stats */}
+        <div style={{display:"flex",width:"100%",borderBottom:"1px solid #e5e5e3",background:"#fff"}}>
+          <StatCell value="5" label="Vendors"/>
+          <StatCell value="30" label="Line items"/>
+          <StatCell value={`₹${(TOTALS[lowestVendor[0]]/100000).toFixed(0)}L`} label="Lowest total bid"/>
+          <StatCell value="13" label="Risk flags" last/>
         </div>
 
-        {/* Filter tabs — sticky at top of left panel */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,padding:"10px 14px",borderBottom:"0.5px solid var(--border)",background:"var(--surface-2)",position:"sticky",top:0,zIndex:10}}>
-          <div style={{fontSize:13,fontWeight:500,color:"var(--text-primary)",whiteSpace:"nowrap"}}>Side-by-side comparison</div>
-          <div style={{display:"flex",gap:5,flexWrap:"wrap",justifyContent:"flex-end"}}>
-            {["All",...CATS].map(cat => (
+        {/* Filter tabs */}
+        <div style={{
+          display:"flex",alignItems:"center",gap:8,padding:"10px 14px",
+          borderBottom:"1px solid #e5e5e3",background:"#fff",
+          position:"sticky",top:0,zIndex:10,overflowX:"auto",
+        }}>
+          {["All",...CATS].map(cat => {
+            const active = catFilter === cat;
+            return (
               <button key={cat} onClick={()=>setCatFilter(cat)} style={{
-                fontSize:11,padding:"3px 8px",borderRadius:"var(--radius)",cursor:"pointer",
-                border: catFilter===cat ? "0.5px solid var(--border-accent)" : "0.5px solid var(--border)",
-                background: catFilter===cat ? "var(--bg-accent)" : "var(--surface-1)",
-                color: catFilter===cat ? "var(--text-accent)" : "var(--text-secondary)"
+                fontSize:11,padding:"5px 12px",borderRadius:999,cursor:"pointer",flexShrink:0,
+                border: active ? "1px solid #378add" : "1px solid #e5e5e3",
+                background: active ? "#378add" : "#fff",
+                color: active ? "#fff" : "#5f5e5a",
+                fontWeight: active ? 600 : 400,
               }}>{cat}</button>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
         <BidTable filter={catFilter}/>
       </div>
 
       {/* Right — Chat */}
-      <div style={{display:"flex",flexDirection:"column",background:"var(--surface-1)",minWidth:0,overflow:"hidden"}}>
-        <div style={{fontSize:10,fontWeight:600,color:"var(--text-muted)",padding:"10px 14px 6px",letterSpacing:0.5,textTransform:"uppercase",textAlign:"left"}}>
-          AI analyst
+      <div style={{
+        display:"flex",flexDirection:"column",background:"#ffffff",
+        minWidth:0,overflow:"hidden",borderLeft:"none",
+      }}>
+        <div style={{
+          fontSize:10,fontWeight:600,color:"#888780",padding:"12px 14px 8px",
+          letterSpacing:0.8,textTransform:"uppercase",textAlign:"left",
+        }}>
+          AI Analyst
         </div>
 
-        <div ref={chatRef} style={{flex:1,overflowY:"auto",padding:"8px 14px 12px",display:"flex",flexDirection:"column",gap:10,alignItems:"stretch"}}>
+        <div ref={chatRef} style={{
+          flex:1,overflowY:"auto",padding:"4px 14px 12px",
+          display:"flex",flexDirection:"column",gap:10,alignItems:"stretch",
+        }}>
           {messages.length === 0 && (
-            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start",justifyContent:"center",flex:1,gap:6,color:"var(--text-muted)",fontSize:13,textAlign:"left",padding:"12px 4px"}}>
+            <div style={{
+              display:"flex",flexDirection:"column",alignItems:"flex-start",justifyContent:"center",
+              flex:1,gap:6,color:"#888780",fontSize:13,textAlign:"left",padding:"12px 4px",
+            }}>
               <div style={{fontSize:28}}>💬</div>
-              <div style={{color:"var(--text-secondary)"}}>Ask anything about the bids</div>
+              <div style={{color:"#5f5e5a"}}>Ask anything about the bids</div>
               <div style={{fontSize:11}}>Prices · risks · charts · recommendations</div>
             </div>
           )}
@@ -378,27 +491,41 @@ export default function App() {
           {messages.map((m, i) => {
             if (m.role === "user") {
               return (
-                <div key={i} style={{alignSelf:"flex-end",background:"var(--bg-accent)",color:"var(--text-primary)",borderRadius:"12px 12px 2px 12px",padding:"9px 13px",fontSize:13,lineHeight:1.45,maxWidth:"88%",textAlign:"left",border:"0.5px solid var(--border-accent)"}}>
+                <div key={i} style={{
+                  alignSelf:"flex-end",background:"#1a6abf",color:"#fff",
+                  borderRadius:"12px 12px 2px 12px",padding:"9px 13px",
+                  fontSize:13,lineHeight:1.45,maxWidth:"88%",textAlign:"left",
+                }}>
                   {m.text}
                 </div>
               );
             }
             const p = m.parsed;
             return (
-              <div key={i} style={{alignSelf:"flex-start",width:"100%",maxWidth:"100%",boxSizing:"border-box",background:"var(--surface-2)",border:"0.5px solid var(--border)",borderRadius:"2px 12px 12px 12px",padding:"11px 13px",textAlign:"left"}}>
-                <div style={{fontSize:13,lineHeight:1.55,color:"var(--text-primary)",textAlign:"left",marginBottom:p.data||p.flags?.length?8:0}}>{p.summary}</div>
+              <div key={i} style={{
+                alignSelf:"flex-start",width:"100%",boxSizing:"border-box",
+                background:"#fff",border:"1px solid #e5e5e3",
+                borderRadius:"2px 12px 12px 12px",padding:"11px 13px",textAlign:"left",
+              }}>
+                <div style={{
+                  fontSize:13,lineHeight:1.55,color:"#111",textAlign:"left",
+                  marginBottom:p.data||p.flags?.length?8:0,
+                }}>{p.summary}</div>
                 {(p.answer_type==="table"||p.answer_type==="mixed") && <AITable data={p.data}/>}
                 {(p.answer_type==="chart"||p.answer_type==="mixed") && <AIChart data={p.data}/>}
                 {p.flags?.length > 0 && (
                   <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:4}}>
                     {p.flags.map((f,fi)=>(
-                      <div key={fi} style={{fontSize:11,color:"var(--text-warning)",background:"var(--bg-warning)",border:"0.5px solid var(--border-warning)",borderRadius:"var(--radius)",padding:"4px 8px",textAlign:"left"}}>
+                      <div key={fi} style={{
+                        fontSize:11,color:"#92400e",background:"#fef3c7",
+                        border:"1px solid #f59e0b",borderRadius:6,padding:"5px 8px",textAlign:"left",
+                      }}>
                         ⚠ {f}
                       </div>
                     ))}
                   </div>
                 )}
-                <div style={{fontSize:10,color:"var(--text-muted)",marginTop:8,display:"flex",alignItems:"center",textAlign:"left"}}>
+                <div style={{fontSize:10,color:"#888780",marginTop:8,display:"flex",alignItems:"center",textAlign:"left"}}>
                   <ConfidenceDot level={p.confidence}/>{p.confidence} confidence
                 </div>
               </div>
@@ -406,9 +533,15 @@ export default function App() {
           })}
 
           {loading && (
-            <div style={{alignSelf:"flex-start",background:"var(--surface-2)",border:"0.5px solid var(--border)",borderRadius:"2px 12px 12px 12px",padding:"12px 14px",display:"flex",gap:5,alignItems:"center"}}>
+            <div style={{
+              alignSelf:"flex-start",background:"#fff",border:"1px solid #e5e5e3",
+              borderRadius:"2px 12px 12px 12px",padding:"12px 14px",display:"flex",gap:5,alignItems:"center",
+            }}>
               {[0,150,300].map(d=>(
-                <span key={d} style={{width:6,height:6,borderRadius:"50%",background:"var(--text-muted)",display:"inline-block",animation:"pulse 1.2s infinite",animationDelay:`${d}ms`}}/>
+                <span key={d} style={{
+                  width:6,height:6,borderRadius:"50%",background:"#888780",
+                  display:"inline-block",animation:"pulse 1.2s infinite",animationDelay:`${d}ms`,
+                }}/>
               ))}
             </div>
           )}
@@ -417,25 +550,39 @@ export default function App() {
         {/* Suggestions */}
         <div style={{padding:"8px 14px 0",display:"flex",flexWrap:"wrap",gap:6}}>
           {SUGGESTIONS.map(s=>(
-            <button key={s} onClick={()=>send(s)} style={{fontSize:11,padding:"4px 9px",border:"0.5px solid var(--border-accent)",borderRadius:"var(--radius)",color:"var(--text-accent)",background:"var(--bg-accent)",cursor:"pointer",lineHeight:1.3,textAlign:"left"}}>
+            <button key={s} onClick={()=>send(s)} style={{
+              fontSize:10,padding:"4px 10px",border:"1px solid #85b7eb",borderRadius:999,
+              color:"#185fa5",background:"#fff",cursor:"pointer",lineHeight:1.3,textAlign:"left",
+            }}>
               {s}
             </button>
           ))}
         </div>
 
         {/* Input */}
-        <div style={{padding:"10px 14px 14px",borderTop:"0.5px solid var(--border)",marginTop:8,background:"var(--surface-2)",display:"flex",gap:8,alignItems:"center"}}>
+        <div style={{
+          padding:"10px 14px 14px",borderTop:"1px solid #e5e5e3",marginTop:8,
+          background:"#fff",display:"flex",gap:8,alignItems:"center",
+        }}>
           <input
             value={input}
             onChange={e=>setInput(e.target.value)}
             onKeyDown={handleKey}
             placeholder="Ask about vendors, prices, risks..."
-            style={{flex:1,width:"100%",fontSize:13,padding:"10px 12px",border:"0.5px solid var(--border-strong)",borderRadius:"var(--radius)",background:"var(--surface-0)",color:"var(--text-primary)",outline:"none",fontFamily:"var(--font-sans)",boxSizing:"border-box"}}
+            style={{
+              flex:1,width:"100%",height:36,fontSize:13,padding:"0 12px",
+              border:"1px solid #d1d1ce",borderRadius:8,background:"#fff",color:"#111",
+              outline:"none",fontFamily:"inherit",
+            }}
           />
           <button
             onClick={()=>send(input)}
             disabled={loading}
-            style={{width:38,height:38,borderRadius:"var(--radius)",border:"none",background:"var(--fill-accent)",color:"#fff",cursor:loading?"not-allowed":"pointer",fontSize:16,opacity:loading?0.4:1,flexShrink:0}}
+            style={{
+              width:36,height:36,borderRadius:"50%",border:"none",background:"#378add",
+              color:"#fff",cursor:loading?"not-allowed":"pointer",fontSize:16,
+              opacity:loading?0.4:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",
+            }}
           >
             →
           </button>
