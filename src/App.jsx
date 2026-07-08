@@ -210,9 +210,36 @@ function th(extra={}) {
 
 function AITable({ data }) {
   if (!data?.columns) return null;
+
+  const exportTableCSV = () => {
+    const escape = (cell) => {
+      const s = String(cell ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv = [
+      data.columns.map(escape).join(","),
+      ...(data.rows || []).map(row => row.map(escape).join(",")),
+    ].join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "aerchain_analyst_export.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={{overflowX:"auto",marginTop:8}}>
-      <table style={{width:"100%",borderCollapse:"collapse",fontSize:10,border:"none"}}>
+      <button
+        onClick={exportTableCSV}
+        style={{
+          fontSize:10,padding:"2px 7px",border:"0.5px solid #d1d1ce",borderRadius:4,
+          background:"#fff",color:"#5f5e5a",cursor:"pointer",float:"right",marginBottom:4,
+        }}
+      >
+        ↓ CSV
+      </button>
+      <table style={{width:"100%",borderCollapse:"collapse",fontSize:10,border:"none",clear:"both"}}>
         <thead>
           <tr>
             {data.columns.map((c,i)=>(
@@ -265,9 +292,17 @@ function AIChart({ data }) {
   return (
     <div style={{height:200,marginTop:8}}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{top:4,right:8,left:0,bottom:4}}>
+        <BarChart data={chartData} margin={{top:4,right:12,left:8,bottom:40}}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e3" vertical={false}/>
-          <XAxis dataKey="label" tick={{fontSize:10,fill:"#888780"}} axisLine={false} tickLine={false}/>
+          <XAxis
+            dataKey="label"
+            angle={-35}
+            textAnchor="end"
+            interval={0}
+            tick={{fontSize:9,fill:"#888780"}}
+            axisLine={false}
+            tickLine={false}
+          />
           <YAxis tick={{fontSize:10,fill:"#888780"}} axisLine={false} tickLine={false} tickFormatter={v=>v>=100000?`${(v/100000).toFixed(0)}L`:v}/>
           <Tooltip formatter={(v,name)=>[v.toLocaleString("en-IN"), name]} contentStyle={{fontSize:11,border:"1px solid #e5e5e3",borderRadius:6,background:"#fff",boxShadow:"none"}}/>
           {series.length>1 && <Legend wrapperStyle={{fontSize:10}}/>}
@@ -300,6 +335,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("aerchain_onboarded"));
+  const [chatWidth, setChatWidth] = useState(420);
+  const [dragging, setDragging] = useState(false);
   const chatRef = useRef(null);
 
   useEffect(() => {
@@ -321,6 +358,25 @@ export default function App() {
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (!dragging) return;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    const onMove = (e) => {
+      const next = window.innerWidth - e.clientX;
+      setChatWidth(Math.min(700, Math.max(320, next)));
+    };
+    const onUp = () => setDragging(false);
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => {
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+  }, [dragging]);
 
   const lowestVendor = Object.entries(TOTALS).sort((a,b)=>a[1]-b[1])[0];
 
@@ -358,15 +414,15 @@ export default function App() {
 
   return (
     <div style={{
-      display:"grid",gridTemplateColumns:"1fr 420px",gridTemplateRows:"48px 1fr",
+      display:"flex",flexDirection:"column",
       height:"100vh",width:"100vw",margin:0,padding:0,overflow:"hidden",
       background:"#fafaf9",fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",color:"#111",
     }}>
 
       {/* Topbar */}
       <div style={{
-        gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"space-between",
-        height:48,padding:"0 16px",margin:0,background:"#0f0f0f",borderRadius:0,
+        display:"flex",alignItems:"center",justifyContent:"space-between",
+        height:48,padding:"0 16px",margin:0,background:"#0f0f0f",borderRadius:0,flexShrink:0,
       }}>
         <div style={{display:"flex",alignItems:"center",gap:12,minWidth:0}}>
           <div style={{fontSize:15,fontWeight:500,letterSpacing:-0.2,whiteSpace:"nowrap",color:"#fff"}}>
@@ -395,10 +451,11 @@ export default function App() {
         </div>
       </div>
 
+      <div style={{display:"flex",flexDirection:"row",flex:1,minHeight:0,overflow:"hidden"}}>
       {/* Left — Comparison Table */}
       <div style={{
-        overflowY:"auto",overflowX:"auto",borderRight:"1px solid #e5e5e3",
-        background:"#fafaf9",minWidth:0,minHeight:0,margin:0,padding:0,
+        flex:1,overflow:"auto",minWidth:400,
+        background:"#fafaf9",margin:0,padding:0,
       }}>
         {showOnboarding && (
           <div style={{
@@ -461,10 +518,19 @@ export default function App() {
         <BidTable filter={catFilter}/>
       </div>
 
+      {/* Drag handle */}
+      <div
+        onMouseDown={(e) => { e.preventDefault(); setDragging(true); }}
+        style={{
+          width:4,background: dragging ? "#378add" : "#e5e5e3",cursor:"col-resize",
+          flexShrink:0,alignSelf:"stretch",
+        }}
+      />
+
       {/* Right — Chat */}
       <div style={{
         display:"flex",flexDirection:"column",background:"#ffffff",
-        minWidth:0,overflow:"hidden",borderLeft:"none",
+        width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,overflow:"hidden",
       }}>
         <div style={{
           fontSize:10,fontWeight:600,color:"#888780",padding:"12px 14px 8px",
@@ -517,10 +583,11 @@ export default function App() {
                   <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:4}}>
                     {p.flags.map((f,fi)=>(
                       <div key={fi} style={{
-                        fontSize:11,color:"#92400e",background:"#fef3c7",
-                        border:"1px solid #f59e0b",borderRadius:6,padding:"5px 8px",textAlign:"left",
+                        fontSize:11,color:"#78350f",background:"#fffbf0",
+                        borderLeft:"3px solid #f59e0b",borderRadius:"0 6px 6px 0",
+                        padding:"8px 10px",textAlign:"left",
                       }}>
-                        ⚠ {f}
+                        ⚠ {String(f).replace(/^⚠\s*/, "")}
                       </div>
                     ))}
                   </div>
@@ -587,6 +654,7 @@ export default function App() {
             →
           </button>
         </div>
+      </div>
       </div>
     </div>
   );
