@@ -649,9 +649,8 @@ export default function App() {
 
       {/* Right — Chat */}
       <div style={{
-        display:"flex",flexDirection:"column",background:"#ffffff",
-        width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,
-        height:"calc(100vh - 48px)",minHeight:0,overflow:"hidden",
+        display:"flex",flexDirection:"column",height:"calc(100vh - 48px)",overflow:"hidden",
+        background:"#ffffff",width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,
       }}>
         <div style={{
           fontSize:10,fontWeight:600,color:"#888780",padding:"12px 14px 8px",
@@ -661,8 +660,8 @@ export default function App() {
         </div>
 
         <div ref={chatRef} style={{
-          flex:1,overflowY:"auto",minHeight:0,padding:"4px 14px 12px",
-          display:"flex",flexDirection:"column",gap:10,alignItems:"stretch",
+          flex:1,overflowY:"auto",overflowX:"hidden",minHeight:0,padding:"12px",
+          display:"flex",flexDirection:"column",gap:"10px",
         }}>
           {messages.length === 0 && (
             <div style={{
