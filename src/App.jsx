@@ -201,7 +201,7 @@ export default function App() {
       </div>
 
       {/* Main content row */}
-      <div style={{display:'flex',height:'calc(100vh - 48px)',overflow:'hidden'}}>
+      <div style={{display:'flex',height:'calc(100vh - 48px)',overflow:'hidden',alignItems:'stretch'}}>
 
         {/* Left panel */}
         <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,minHeight:0,overflow:'hidden'}}>
