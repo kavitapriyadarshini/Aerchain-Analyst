@@ -426,7 +426,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    const t = setTimeout(() => {
+      if (chatRef.current) {
+        chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
+      }
+    }, 50);
+    return () => clearTimeout(t);
   }, [messages, loading]);
 
   useEffect(() => {
@@ -645,17 +650,18 @@ export default function App() {
       {/* Right — Chat */}
       <div style={{
         display:"flex",flexDirection:"column",background:"#ffffff",
-        width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,overflow:"hidden",
+        width:chatWidth,minWidth:320,maxWidth:700,flexShrink:0,
+        height:"calc(100vh - 48px)",minHeight:0,overflow:"hidden",
       }}>
         <div style={{
           fontSize:10,fontWeight:600,color:"#888780",padding:"12px 14px 8px",
-          letterSpacing:0.8,textTransform:"uppercase",textAlign:"left",
+          letterSpacing:0.8,textTransform:"uppercase",textAlign:"left",flexShrink:0,
         }}>
           AI Analyst
         </div>
 
         <div ref={chatRef} style={{
-          flex:1,overflowY:"auto",padding:"4px 14px 12px",
+          flex:1,overflowY:"auto",minHeight:0,padding:"4px 14px 12px",
           display:"flex",flexDirection:"column",gap:10,alignItems:"stretch",
         }}>
           {messages.length === 0 && (
@@ -721,7 +727,7 @@ export default function App() {
         </div>
 
         {/* Suggestions */}
-        <div style={{padding:"8px 14px 0",display:"flex",flexWrap:"wrap",gap:6}}>
+        <div style={{padding:"8px 14px 0",display:"flex",flexWrap:"wrap",gap:6,flexShrink:0}}>
           {SUGGESTIONS.map(s=>(
             <button key={s} onClick={()=>send(s)} style={{
               fontSize:10,padding:"4px 10px",border:"1px solid #85b7eb",borderRadius:999,
@@ -735,7 +741,7 @@ export default function App() {
         {/* Input */}
         <div style={{
           padding:"10px 14px 14px",borderTop:"1px solid #e5e5e3",marginTop:8,
-          background:"#fff",display:"flex",gap:8,alignItems:"center",
+          background:"#fff",display:"flex",gap:8,alignItems:"center",flexShrink:0,
         }}>
           <input
             value={input}
