@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell, ResponsiveContainer
@@ -411,6 +412,179 @@ export default function App() {
   const TOPBAR_H = 48;
   const CONTENT_H = `calc(100vh - ${TOPBAR_H}px)`;
 
+  function exportFullPDF() {
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageW = 297, pageH = 210, margin = 14;
+    let y = 14;
+
+    pdf.setFillColor(15, 15, 15);
+    pdf.rect(0, 0, pageW, 16, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('AERCHAIN ANALYST — BID COMPARISON REPORT', margin, 11);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.text(`RFQ-2026-IT-0047 · Nexova Technologies · Generated ${new Date().toLocaleDateString('en-IN')}`, pageW - margin, 11, { align: 'right' });
+    y = 24;
+
+    pdf.setTextColor(17, 17, 17);
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold');
+    const lowestPdf = Object.entries(TOTALS).sort((a,b)=>a[1]-b[1])[0];
+    const stats = [`Vendors: 5`, `Line Items: 30`, `Lowest Bid: ₹${(TOTALS[lowestPdf[0]]/100000).toFixed(0)}L`, `Risk Flags: 13`];
+    stats.forEach((s, i) => {
+      pdf.setFillColor(245, 245, 243);
+      pdf.roundedRect(margin + i * 65, y, 62, 10, 2, 2, 'F');
+      pdf.setTextColor(17, 17, 17);
+      pdf.text(s, margin + i * 65 + 4, y + 7);
+    });
+    y += 18;
+
+    pdf.setFontSize(11);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(17, 17, 17);
+    pdf.text('Side-by-Side Bid Comparison', margin, y);
+    y += 6;
+
+    const vendorNames = V.map(v => `${v.name.split(' ')[0]}\n${v.id}${FLAG_COUNTS[v.id] > 0 ? ` (${FLAG_COUNTS[v.id]} flags)` : ''}`);
+    const head = [['Item', 'Description', 'Qty', ...vendorNames]];
+    const body = IT.map(item => {
+      return [
+        item.id,
+        item.description.length > 40 ? item.description.substring(0, 40) + '...' : item.description,
+        `${item.quantity} ${item.unit}`,
+        ...V.map(v => {
+          const b = item.bids[v.id];
+          if (!b) return '—';
+          return `₹${b.unit_price.toLocaleString('en-IN')}\n${b.lead_time_days}d · ${b.warranty_years}yr`;
+        })
+      ];
+    });
+
+    autoTable(pdf, {
+      head,
+      body,
+      startY: y,
+      margin: { left: margin, right: margin },
+      styles: { fontSize: 7, cellPadding: 2, lineColor: [232, 231, 228], lineWidth: 0.2 },
+      headStyles: { fillColor: [15, 15, 15], textColor: 255, fontStyle: 'bold', fontSize: 7 },
+      alternateRowStyles: { fillColor: [250, 250, 249] },
+      columnStyles: {
+        0: { cellWidth: 12 },
+        1: { cellWidth: 55 },
+        2: { cellWidth: 16 },
+      },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index > 2) {
+          const item = IT[data.row.index];
+          if (item) {
+            const vendor = V[data.column.index - 3];
+            const b = item.bids[vendor?.id];
+            const prices = V.map(vv => item.bids[vv.id]?.unit_price).filter(Boolean);
+            const minP = Math.min(...prices);
+            if (b && b.unit_price === minP) {
+              data.cell.styles.textColor = [45, 106, 31];
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
+      }
+    });
+
+    if (messages.length > 0) {
+      pdf.addPage('landscape');
+      y = 14;
+
+      pdf.setFillColor(15, 15, 15);
+      pdf.rect(0, 0, pageW, 16, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('AI ANALYST — CONVERSATION LOG', margin, 11);
+      y = 24;
+
+      messages.forEach((m) => {
+        if (y > pageH - 20) { pdf.addPage('landscape'); y = 20; }
+
+        if (m.role === 'user') {
+          pdf.setFillColor(26, 106, 191);
+          pdf.roundedRect(pageW - margin - 160, y, 160, 10, 2, 2, 'F');
+          pdf.setTextColor(255, 255, 255);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'bold');
+          const lines = pdf.splitTextToSize(m.text, 155);
+          pdf.text(lines, pageW - margin - 4, y + 7, { align: 'right' });
+          y += Math.max(12, lines.length * 5 + 4);
+        } else {
+          const p = m.parsed;
+          pdf.setFillColor(250, 250, 249);
+          pdf.setDrawColor(55, 138, 221);
+          pdf.setLineWidth(0.5);
+          const summaryLines = pdf.splitTextToSize(p.summary || '', pageW - margin * 2 - 4);
+          const boxH = summaryLines.length * 5 + 8;
+          if (y + boxH > pageH - 20) { pdf.addPage('landscape'); y = 20; }
+          pdf.roundedRect(margin, y, pageW - margin * 2, boxH, 2, 2, 'FD');
+          pdf.setFillColor(55, 138, 221);
+          pdf.rect(margin, y, 2, boxH, 'F');
+          pdf.setTextColor(17, 17, 17);
+          pdf.setFontSize(9);
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(summaryLines, margin + 5, y + 6);
+          y += boxH + 3;
+
+          if ((p.answer_type === 'table' || p.answer_type === 'mixed') && p.data?.columns) {
+            if (y > pageH - 40) { pdf.addPage('landscape'); y = 20; }
+            autoTable(pdf, {
+              head: [p.data.columns],
+              body: p.data.rows || [],
+              startY: y,
+              margin: { left: margin, right: margin },
+              styles: { fontSize: 7, cellPadding: 2 },
+              headStyles: { fillColor: [55, 138, 221], textColor: 255, fontStyle: 'bold', fontSize: 7 },
+              alternateRowStyles: { fillColor: [250, 250, 249] },
+            });
+            y = pdf.lastAutoTable.finalY + 4;
+          }
+
+          if (p.flags?.length > 0) {
+            if (y > pageH - 20) { pdf.addPage('landscape'); y = 20; }
+            p.flags.slice(0, 5).forEach(flag => {
+              const flagLines = pdf.splitTextToSize(`⚠ ${flag}`, pageW - margin * 2 - 8);
+              pdf.setFillColor(255, 251, 240);
+              pdf.setDrawColor(245, 158, 11);
+              pdf.roundedRect(margin, y, pageW - margin * 2, flagLines.length * 4 + 6, 1, 1, 'FD');
+              pdf.setTextColor(120, 53, 15);
+              pdf.setFontSize(8);
+              pdf.text(flagLines, margin + 4, y + 5);
+              y += flagLines.length * 4 + 8;
+            });
+          }
+
+          pdf.setFontSize(8);
+          pdf.setTextColor(150, 150, 150);
+          pdf.setFont('helvetica', 'italic');
+          pdf.text(`${p.confidence} confidence`, margin, y);
+          y += 8;
+        }
+      });
+    }
+
+    const pageCount = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setFillColor(245, 245, 243);
+      pdf.rect(0, pageH - 10, pageW, 10, 'F');
+      pdf.setFontSize(7);
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Aerchain Analyst · RFQ-2026-IT-0047 · Nexova Technologies', margin, pageH - 3);
+      pdf.text(`Page ${i} of ${pageCount}`, pageW - margin, pageH - 3, { align: 'right' });
+    }
+
+    pdf.save('aerchain_bid_report.pdf');
+  }
+
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", background: '#fafaf9' }}>
       <style>{`*{box-sizing:border-box}body,html{margin:0;padding:0;overflow:hidden}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:#d1d1ce;border-radius:4px}::-webkit-scrollbar-track{background:transparent}`}</style>
@@ -423,7 +597,7 @@ export default function App() {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={downloadCSV} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#888', cursor: 'pointer' }}>↓ Export CSV</button>
-          <button onClick={() => window.print()} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#888', cursor: 'pointer' }}>↓ Export PDF</button>
+          <button onClick={exportFullPDF} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#888', cursor: 'pointer' }}>↓ Export PDF</button>
         </div>
       </div>
 
