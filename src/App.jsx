@@ -155,6 +155,7 @@ const SUGGESTIONS = [
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [cat, setCat] = useState("All");
+  const [view, setView] = useState('table');
   const [sortVendor, setSortVendor] = useState(null);
   const [sortDir, setSortDir] = useState('asc');
   const [messages, setMessages] = useState([]);
@@ -262,14 +263,22 @@ export default function App() {
           </div>
           {/* Filters */}
           <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', background: '#fff', borderBottom: '1px solid #e8e7e4', overflowX: 'auto' }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: '#111', whiteSpace: 'nowrap' }}>Side-by-side comparison</span>
-            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-              {["All", ...CATS].map(c => (
-                <button key={c} onClick={() => setCat(c)} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 999, cursor: 'pointer', border: cat === c ? '1px solid #85b7eb' : '1px solid #e5e5e3', background: cat === c ? '#e6f1fb' : '#fff', color: cat === c ? '#185fa5' : '#666', whiteSpace: 'nowrap' }}>{c}</button>
-              ))}
+            <div style={{display:'flex',gap:4,marginRight:12,flexShrink:0}}>
+              <button onClick={()=>setView('table')} style={{fontSize:10,padding:'3px 8px',borderRadius:999,cursor:'pointer',border:view==='table'?'1px solid #85b7eb':'1px solid #e5e5e3',background:view==='table'?'#e6f1fb':'#fff',color:view==='table'?'#185fa5':'#666',fontWeight:view==='table'?600:400}}>Comparison</button>
+              <button onClick={()=>setView('risks')} style={{fontSize:10,padding:'3px 8px',borderRadius:999,cursor:'pointer',border:view==='risks'?'1px solid #f59e0b':'1px solid #e5e5e3',background:view==='risks'?'#fffbf0':'#fff',color:view==='risks'?'#92400e':'#666',fontWeight:view==='risks'?600:400}}>⚠ Risks & Docs</button>
             </div>
+            {view === 'table' && (
+              <>
+                <span style={{ fontSize: 12, fontWeight: 500, color: '#111', whiteSpace: 'nowrap' }}>Side-by-side comparison</span>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {["All", ...CATS].map(c => (
+                    <button key={c} onClick={() => setCat(c)} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 999, cursor: 'pointer', border: cat === c ? '1px solid #85b7eb' : '1px solid #e5e5e3', background: cat === c ? '#e6f1fb' : '#fff', color: cat === c ? '#185fa5' : '#666', whiteSpace: 'nowrap' }}>{c}</button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
-          {/* Table — scrollable */}
+          {view === 'table' ? (
           <div style={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11, minWidth: 650 }}>
               <thead>
@@ -324,6 +333,68 @@ export default function App() {
               </tbody>
             </table>
           </div>
+          ) : (
+          <div style={{flex:1,overflow:'auto',minHeight:0,padding:16}}>
+            <div style={{marginBottom:24}}>
+              <div style={{fontSize:12,fontWeight:600,color:'#111',marginBottom:12,display:'flex',alignItems:'center',gap:6}}>
+                <span style={{width:8,height:8,borderRadius:'50%',background:'#dc2626',display:'inline-block'}}/>
+                Risk Flags <span style={{fontSize:11,fontWeight:400,color:'#999',marginLeft:4}}>13 identified</span>
+              </div>
+              {DS.vendors.map(v => {
+                const flags = DS.red_flags.filter(r => r.vendor_id === v.id);
+                if (!flags.length) return null;
+                return (
+                  <div key={v.id} style={{marginBottom:12}}>
+                    <div style={{fontSize:11,fontWeight:600,color:'#374151',marginBottom:4,display:'flex',alignItems:'center',gap:6}}>
+                      <span style={{width:16,height:16,borderRadius:'50%',background:'#dc2626',color:'#fff',fontSize:9,display:'inline-flex',alignItems:'center',justifyContent:'center',fontWeight:700,flexShrink:0}}>{flags.length}</span>
+                      {v.name}
+                    </div>
+                    {flags.map((f,i) => (
+                      <div key={i} style={{fontSize:11,color:'#78350f',background:'#fffbf0',borderLeft:'3px solid #f59e0b',borderRadius:'0 4px 4px 0',padding:'5px 10px',marginBottom:4}}>
+                        {f.flag}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+              <div style={{fontSize:11,color:'#166534',background:'#f0fdf4',borderLeft:'3px solid #22c55e',borderRadius:'0 4px 4px 0',padding:'5px 10px'}}>
+                ✓ V1 Crestline Systems — No risk flags identified
+              </div>
+            </div>
+
+            <div>
+              <div style={{fontSize:12,fontWeight:600,color:'#111',marginBottom:12,display:'flex',alignItems:'center',gap:6}}>
+                <span style={{fontSize:14}}>📄</span>
+                Submitted Documents <span style={{fontSize:11,fontWeight:400,color:'#999',marginLeft:4}}>4 documents</span>
+              </div>
+              {DS.attached_documents.map((doc,i) => {
+                const vendor = DS.vendors.find(v => v.id === doc.vendor_id);
+                return (
+                  <div key={i} style={{border:'1px solid #e8e7e4',borderRadius:8,padding:'10px 14px',marginBottom:8,background:'#fff',display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:12}}>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,fontWeight:600,color:'#111',marginBottom:2}}>{doc.doc_type}</div>
+                      <div style={{fontSize:10,color:'#666',marginBottom:4}}>{vendor?.name}</div>
+                      <div style={{fontSize:11,color:'#444',lineHeight:1.5}}>{doc.summary}</div>
+                    </div>
+                    <button onClick={()=>{
+                      const content = `Vendor: ${vendor?.name}\nDocument: ${doc.doc_type}\nSummary: ${doc.summary}`;
+                      const a = document.createElement('a');
+                      a.href = URL.createObjectURL(new Blob([content],{type:'text/plain'}));
+                      a.download = `${vendor?.id}_${doc.doc_type.replace(/\s+/g,'_')}.txt`;
+                      a.click();
+                    }} style={{fontSize:10,padding:'4px 8px',border:'1px solid #e0e0de',borderRadius:6,background:'#fafaf9',color:'#555',cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>
+                      ↓ Download
+                    </button>
+                  </div>
+                );
+              })}
+              <div style={{border:'1px solid #fee2e2',borderRadius:8,padding:'10px 14px',background:'#fff5f5'}}>
+                <div style={{fontSize:11,fontWeight:600,color:'#991b1b',marginBottom:2}}>No documents submitted</div>
+                <div style={{fontSize:10,color:'#666'}}>V2 Orbitex Technologies — only vendor with zero documentation</div>
+              </div>
+            </div>
+          </div>
+          )}
         </div>
 
         {/* DRAG HANDLE */}
