@@ -68,16 +68,13 @@ Rules: Lead with insight. Always flag V4 risks. Use Indian number format. confid
 // ─── JSON extractor ───────────────────────────────────────────────────────────
 function extractJSON(text) {
   if (!text) return null;
-  // Try direct parse
   try { return JSON.parse(text.trim()); } catch {}
-  // Strip markdown fences
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
   if (fenced) { try { return JSON.parse(fenced[1].trim()); } catch {} }
-  // Find first { to last }
   const s = text.indexOf('{'), e = text.lastIndexOf('}');
   if (s !== -1 && e > s) { try { return JSON.parse(text.slice(s, e + 1)); } catch {} }
-  // Fallback
-  return { answer_type: 'text', summary: text, data: null, flags: [], confidence: 'low' };
+  // If all parsing fails, wrap raw text as a valid response object
+  return { answer_type: 'text', summary: text.replace(/[{}"\[\]]/g, '').substring(0, 500), data: null, flags: [], confidence: 'low' };
 }
 
 // ─── CSV download ─────────────────────────────────────────────────────────────
@@ -126,14 +123,17 @@ function FlagGroups({ flags }) {
   flags.forEach(f => {
     const m = f.match(/^(V\d[^:(]*)/);
     const key = m ? m[1].trim() : 'General';
+    const body = f.replace(/^V\d[^:)]*[):]\s*/, '').trim() || f;
     if (!groups[key]) groups[key] = [];
-    groups[key].push(f.replace(/^V\d[^:)]*[):]\s*/, '').trim() || f);
+    if (body && body.toLowerCase() !== key.toLowerCase()) {
+      groups[key].push(body);
+    }
   });
   return (
     <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
       {Object.entries(groups).map(([vendor, items]) => (
         <div key={vendor} style={{ background: '#fffbf0', borderLeft: '3px solid #f59e0b', borderRadius: '0 6px 6px 0', padding: '8px 12px' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#78350f', marginBottom: 4 }}>⚠ {vendor}</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#78350f', marginBottom: items.length ? 4 : 0 }}>⚠ {vendor}</div>
           {items.map((item, i) => <div key={i} style={{ fontSize: 11, color: '#78350f', paddingLeft: 8, marginBottom: 2 }}>• {item}</div>)}
         </div>
       ))}
@@ -155,6 +155,8 @@ const SUGGESTIONS = [
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [cat, setCat] = useState("All");
+  const [sortVendor, setSortVendor] = useState(null);
+  const [sortDir, setSortDir] = useState('asc');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -192,7 +194,14 @@ export default function App() {
   };
 
   const lowest = Object.entries(TOTALS).sort((a, b) => a[1] - b[1])[0];
-  const items = cat === "All" ? IT : IT.filter(i => i.category === cat);
+  let items = cat === "All" ? IT : IT.filter(i => i.category === cat);
+  if (sortVendor) {
+    items = [...items].sort((a, b) => {
+      const pa = a.bids[sortVendor]?.unit_price ?? (sortDir === 'asc' ? Infinity : -Infinity);
+      const pb = b.bids[sortVendor]?.unit_price ?? (sortDir === 'asc' ? Infinity : -Infinity);
+      return sortDir === 'asc' ? pa - pb : pb - pa;
+    });
+  }
 
   const send = useCallback(async (q) => {
     if (loading || !q.trim()) return;
@@ -270,9 +279,16 @@ export default function App() {
                   </th>
                   <th style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 500, fontSize: 10, color: '#888', borderBottom: '1px solid #e8e7e4' }}>Qty</th>
                   {V.map(v => (
-                    <th key={v.id} style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 500, fontSize: 10, color: '#888', borderBottom: '1px solid #e8e7e4', minWidth: 90 }}>
+                    <th
+                      key={v.id}
+                      onClick={() => {
+                        if (sortVendor === v.id) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+                        else { setSortVendor(v.id); setSortDir('asc'); }
+                      }}
+                      style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 500, fontSize: 10, color: '#888', borderBottom: '1px solid #e8e7e4', minWidth: 90, cursor: 'pointer', userSelect: 'none' }}
+                    >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
-                        <span style={{ color: '#111', fontWeight: 500 }}>{v.name.split(' ')[0]}</span>
+                        <span style={{ color: '#111', fontWeight: 500 }}>{v.name.split(' ')[0]}{sortVendor === v.id ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}</span>
                         {FLAG_COUNTS[v.id] > 0 && <span title={`${FLAG_COUNTS[v.id]} risk flags`} style={{ width: 16, height: 16, borderRadius: '50%', background: '#dc2626', color: '#fff', fontSize: 9, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, cursor: 'help' }}>{FLAG_COUNTS[v.id]}</span>}
                       </div>
                       <div style={{ fontSize: 9, color: '#bbb', fontWeight: 400 }}>{v.id}</div>
