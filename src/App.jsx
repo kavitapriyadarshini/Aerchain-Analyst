@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { jsPDF } from 'jspdf';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell, ResponsiveContainer
@@ -83,6 +84,185 @@ function downloadCSV() {
   const r = IT.map(i => [i.id, `"${i.description}"`, i.category, i.quantity, i.unit, ...V.map(v => i.bids[v.id]?.unit_price ?? 'N/A'), ...V.map(v => i.bids[v.id]?.lead_time_days ?? 'N/A'), ...V.map(v => i.bids[v.id]?.warranty_years ?? 'N/A')]);
   const csv = [h, ...r].map(x => x.join(",")).join("\n");
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "aerchain_bids.csv"; a.click();
+}
+
+function downloadDocPDF(doc, vendor) {
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageW = 210, margin = 20, contentW = pageW - margin * 2;
+  let y = 20;
+
+  pdf.setFillColor(15, 15, 15);
+  pdf.rect(0, 0, 210, 18, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('AERCHAIN PROCUREMENT PLATFORM', margin, 12);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('RFQ-2026-IT-0047 — Nexova Technologies', 210 - margin, 12, { align: 'right' });
+
+  y = 32;
+
+  pdf.setFillColor(230, 241, 251);
+  pdf.roundedRect(margin, y - 5, contentW, 14, 2, 2, 'F');
+  pdf.setTextColor(24, 95, 165);
+  pdf.setFontSize(11);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(doc.doc_type.toUpperCase(), margin + 4, y + 4);
+  y += 18;
+
+  pdf.setTextColor(17, 17, 17);
+  pdf.setFontSize(16);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text(vendor.name, margin, y);
+  y += 7;
+  pdf.setFontSize(10);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(100, 100, 100);
+  pdf.text(`${vendor.hq} · ${vendor.years_in_business} years in business`, margin, y);
+  y += 12;
+
+  pdf.setDrawColor(232, 231, 228);
+  pdf.line(margin, y, pageW - margin, y);
+  y += 10;
+
+  const content = generateDocContent(doc, vendor);
+
+  content.forEach(section => {
+    if (y > 260) { pdf.addPage(); y = 20; }
+
+    if (section.type === 'heading') {
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(17, 17, 17);
+      pdf.text(section.text, margin, y);
+      y += 6;
+      pdf.setDrawColor(55, 138, 221);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, y, margin + 40, y);
+      y += 6;
+    } else if (section.type === 'field') {
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(section.label, margin, y);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(17, 17, 17);
+      pdf.setFontSize(10);
+      const lines = pdf.splitTextToSize(section.value, contentW - 40);
+      pdf.text(lines, margin + 40, y);
+      y += Math.max(6, lines.length * 5);
+    } else if (section.type === 'text') {
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(40, 40, 40);
+      const lines = pdf.splitTextToSize(section.text, contentW);
+      pdf.text(lines, margin, y);
+      y += lines.length * 5 + 4;
+    } else if (section.type === 'spacer') {
+      y += section.h || 6;
+    }
+  });
+
+  pdf.setFillColor(245, 245, 243);
+  pdf.rect(0, 282, 210, 15, 'F');
+  pdf.setFontSize(8);
+  pdf.setTextColor(150, 150, 150);
+  pdf.setFont('helvetica', 'normal');
+  pdf.text('This document was submitted as part of RFQ-2026-IT-0047. Aerchain Procurement Platform.', margin, 291);
+  pdf.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 210 - margin, 291, { align: 'right' });
+
+  pdf.save(`${vendor.id}_${doc.doc_type.replace(/\s+/g, '_')}.pdf`);
+}
+
+function generateDocContent(doc, vendor) {
+  if (doc.doc_type === 'ISO Certificate') {
+    const isV5 = vendor.id === 'V5';
+    const isV3 = vendor.id === 'V3';
+    const certBody = vendor.id === 'V1' ? 'Bureau Veritas Certification India Pvt. Ltd.' : vendor.id === 'V3' ? 'DNV Business Assurance India Pvt. Ltd.' : 'TUV SUD South Asia Pvt. Ltd.';
+    const certNum = vendor.id === 'V1' ? 'BV-ISO-2023-IN-4471' : vendor.id === 'V3' ? 'DNV-2023-BLR-0892' : 'TUV-SUD-2023-HYD-1134';
+    const validUntil = vendor.id === 'V1' ? 'March 2028' : vendor.id === 'V3' ? 'August 2028' : 'November 2026';
+    const standards = isV3 ? 'ISO 9001:2015, ISO 14001:2015' : 'ISO 9001:2015';
+    return [
+      { type: 'heading', text: 'CERTIFICATE OF CONFORMITY' },
+      { type: 'text', text: `This is to certify that the Quality Management System of:` },
+      { type: 'spacer', h: 4 },
+      { type: 'field', label: 'Organisation:', value: vendor.name },
+      { type: 'field', label: 'Address:', value: `${vendor.hq}` },
+      { type: 'field', label: 'Certificate No:', value: certNum },
+      { type: 'field', label: 'Standard(s):', value: standards },
+      { type: 'field', label: 'Valid Until:', value: validUntil },
+      { type: 'field', label: 'Issued By:', value: certBody },
+      { type: 'field', label: 'Scope:', value: 'Procurement, warehousing, and distribution of IT hardware and peripherals across India.' },
+      { type: 'spacer', h: 8 },
+      { type: 'heading', text: 'CERTIFICATION DETAILS' },
+      { type: 'text', text: `The above organisation has been assessed and found to conform to the requirements of ${standards}. This certificate is valid subject to continued surveillance audits.` },
+      { type: 'spacer', h: 6 },
+      isV5 ? { type: 'text', text: '⚠ NOTE: Certificate renewal is currently in progress. The organisation has been notified of the expiry date in November 2026 and renewal audit is scheduled for Q3 2026.' } : { type: 'text', text: 'This certificate was issued following a full third-party audit with zero major non-conformances identified.' },
+    ];
+  }
+
+  if (doc.doc_type === 'Client Reference Letter') {
+    return [
+      { type: 'heading', text: 'CLIENT REFERENCE LETTER' },
+      { type: 'field', label: 'Issuing Company:', value: 'Infosys BPO Limited' },
+      { type: 'field', label: 'Date:', value: 'January 15, 2026' },
+      { type: 'field', label: 'Reference For:', value: vendor.name },
+      { type: 'spacer', h: 6 },
+      { type: 'text', text: 'To Whom It May Concern,' },
+      { type: 'spacer', h: 4 },
+      { type: 'text', text: `This letter serves as a formal reference for ${vendor.name}, who has been a registered IT hardware vendor for Infosys BPO Limited since 2022.` },
+      { type: 'spacer', h: 4 },
+      { type: 'text', text: 'In FY2025-26, we engaged Crestline Systems for the procurement of 850 business laptops and 400 peripheral sets across our Bengaluru, Pune, and Chennai delivery locations. The vendor demonstrated consistent on-time delivery (98.2% SLA compliance), zero DOA incidents reported across the entire order, and responsive after-sales support with an average ticket resolution time of 6 hours.' },
+      { type: 'spacer', h: 4 },
+      { type: 'text', text: 'We rate Crestline Systems as EXCELLENT across all evaluation parameters: Product Quality, Delivery Reliability, After-Sales Support, and Commercial Terms.' },
+      { type: 'spacer', h: 4 },
+      { type: 'text', text: 'We have no hesitation in recommending them for large-scale enterprise IT hardware procurement.' },
+      { type: 'spacer', h: 8 },
+      { type: 'field', label: 'Signed By:', value: 'Rajesh Menon, VP Infrastructure & Procurement' },
+      { type: 'field', label: 'Contact:', value: 'r.menon@infosys.com | +91-80-4116-7890' },
+    ];
+  }
+
+  if (doc.doc_type === 'OEM Authorization Letter') {
+    return [
+      { type: 'heading', text: 'AUTHORIZED RESELLER CERTIFICATE' },
+      { type: 'field', label: 'Issuing OEM:', value: 'Global Computing Technologies Pvt. Ltd. (GCT)' },
+      { type: 'field', label: 'Partner Level:', value: 'GOLD PARTNER' },
+      { type: 'field', label: 'Valid Period:', value: 'April 2026 – March 2027 (FY2026-27)' },
+      { type: 'field', label: 'Authorized Reseller:', value: vendor.name },
+      { type: 'spacer', h: 6 },
+      { type: 'heading', text: 'AUTHORIZATION SCOPE' },
+      { type: 'text', text: `This certifies that ${vendor.name} is an authorized Gold Partner for the sale, distribution, and after-sales support of GCT products across India.` },
+      { type: 'spacer', h: 4 },
+      { type: 'text', text: 'Authorized product categories include: Business Laptops, Workstation Systems, Monitors (24" to 32"), Docking Stations, and Peripherals. The partner is authorized to provide OEM warranty support and access official spare parts channels.' },
+      { type: 'spacer', h: 4 },
+      { type: 'text', text: 'Gold Partner status is awarded to resellers meeting minimum annual sales volume of ₹5 Crore, maintaining trained technical staff (minimum 3 GCT-certified engineers), and achieving a customer satisfaction score above 4.2/5.0.' },
+      { type: 'spacer', h: 8 },
+      { type: 'field', label: 'Authorized By:', value: 'Priya Venkataraman, Partner Programs Director — GCT India' },
+      { type: 'field', label: 'Partner ID:', value: 'GCT-IN-GOLD-2847' },
+    ];
+  }
+
+  if (doc.doc_type === 'Company Registration') {
+    return [
+      { type: 'heading', text: 'COMPANY REGISTRATION DETAILS' },
+      { type: 'field', label: 'Company Name:', value: vendor.name },
+      { type: 'field', label: 'CIN:', value: 'U72900MH2020PTC341892' },
+      { type: 'field', label: 'Incorporation Date:', value: 'April 14, 2020' },
+      { type: 'field', label: 'Registered Office:', value: 'Plot 47B, Hinjewadi Phase 2, Pune, Maharashtra – 411057' },
+      { type: 'field', label: 'Paid-up Capital:', value: '₹50,00,000 (Fifty Lakhs)' },
+      { type: 'field', label: 'Directors:', value: 'Arjun Mehta (DIN: 08124567), Sneha Raut (DIN: 08124568)' },
+      { type: 'field', label: 'DPIIT Ref No:', value: 'DIPP142983' },
+      { type: 'field', label: 'Recognition Date:', value: 'June 2020 — Startup India Scheme' },
+      { type: 'spacer', h: 6 },
+      { type: 'heading', text: 'BUSINESS ACTIVITY' },
+      { type: 'text', text: 'Primary business: Trading and distribution of IT hardware, computers, peripherals, and networking equipment. GST registered under Maharashtra jurisdiction. MSME registered (Udyam Registration No: MH-32-0089234).' },
+      { type: 'spacer', h: 4 },
+      { type: 'text', text: '⚠ PROCUREMENT NOTE: Company is 6 years old with reported turnover of ₹8 Crore (FY2025). Paid-up capital of ₹50L is significantly below the value of this RFQ (₹42L). Buyer is advised to request banker reference and financial statements before award.' },
+    ];
+  }
+
+  return [{ type: 'text', text: doc.summary }];
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -376,13 +556,7 @@ export default function App() {
                       <div style={{fontSize:10,color:'#666',marginBottom:4}}>{vendor?.name}</div>
                       <div style={{fontSize:11,color:'#444',lineHeight:1.5}}>{doc.summary}</div>
                     </div>
-                    <button onClick={()=>{
-                      const content = `Vendor: ${vendor?.name}\nDocument: ${doc.doc_type}\nSummary: ${doc.summary}`;
-                      const a = document.createElement('a');
-                      a.href = URL.createObjectURL(new Blob([content],{type:'text/plain'}));
-                      a.download = `${vendor?.id}_${doc.doc_type.replace(/\s+/g,'_')}.txt`;
-                      a.click();
-                    }} style={{fontSize:10,padding:'4px 8px',border:'1px solid #e0e0de',borderRadius:6,background:'#fafaf9',color:'#555',cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>
+                    <button onClick={() => downloadDocPDF(doc, vendor)} style={{fontSize:10,padding:'4px 8px',border:'1px solid #e0e0de',borderRadius:6,background:'#fafaf9',color:'#555',cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>
                       ↓ Download
                     </button>
                   </div>
