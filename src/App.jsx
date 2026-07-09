@@ -596,8 +596,8 @@ export default function App() {
           <span style={{ fontSize: 10, color: '#888', background: '#1f1f1f', border: '1px solid #2a2a2a', borderRadius: 999, padding: '2px 8px' }}>RFQ-2026-IT-0047</span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={downloadCSV} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#888', cursor: 'pointer' }}>↓ Export CSV</button>
-          <button onClick={exportFullPDF} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #3a3a3a', borderRadius: 6, background: 'transparent', color: '#888', cursor: 'pointer' }}>↓ Export PDF</button>
+          <button onClick={downloadCSV} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #555', borderRadius: 6, background: 'transparent', color: '#fff', cursor: 'pointer' }}>↓ Export CSV</button>
+          <button onClick={exportFullPDF} style={{ fontSize: 11, padding: '4px 10px', border: '1px solid #555', borderRadius: 6, background: 'transparent', color: '#fff', cursor: 'pointer' }}>↓ Export PDF</button>
         </div>
       </div>
 
